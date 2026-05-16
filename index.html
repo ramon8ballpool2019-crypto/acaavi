@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Açaví — Açaí Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080510;--card:#16101f;--card2:#1c1428;--card3:#221633;
+  --border:rgba(212,168,71,.14);--border2:rgba(255,255,255,.06);
+  --gold:#c9a227;--gold-l:#f0c96a;--gold-dim:rgba(201,162,39,.12);
+  --purple:#6b21a8;--purple-l:#a855f7;
+  --text:#f0e8ff;--muted:#8a7a9e;
+  --green:#22c55e;--red:#ef4444;
+  --r:14px;--tr:.3s cubic-bezier(.22,.68,0,1.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 70% 40% at 85% 5%,rgba(107,33,168,.15) 0,transparent 70%),
+  radial-gradient(ellipse 50% 30% at 5% 90%,rgba(201,162,39,.07) 0,transparent 70%);
+  pointer-events:none;z-index:0;}
+input[type=file]{display:none;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#1e1126;border:1px solid var(--border);border-radius:10px;padding:10px 20px;
+  font-size:13px;z-index:2000;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:var(--green);color:#86efac;}
+.toast.err{border-color:var(--red);color:#fca5a5;}
+
+/* ── ADMIN BAR ── */
+.admin-bar{position:fixed;top:0;left:0;right:0;z-index:500;
+  background:linear-gradient(90deg,#1a0a2e,#2d1040);
+  border-bottom:1px solid rgba(168,85,247,.4);
+  padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  transform:translateY(-100%);transition:.35s ease;}
+.admin-bar.open{transform:translateY(0);}
+.admin-bar-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--purple-l);white-space:nowrap;}
+.admin-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.abtn{border:1px solid rgba(168,85,247,.4);background:rgba(168,85,247,.15);color:var(--purple-l);
+  border-radius:8px;padding:6px 12px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;}
+.abtn:hover{background:rgba(168,85,247,.3);}
+.abtn.danger{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.4);color:#fca5a5;}
+.abtn.save{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.4);color:#86efac;}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;text-align:center;padding:68px 20px 44px;border-bottom:1px solid var(--border);}
+.hero.pad-top{padding-top:108px;}
+.logo-ring{width:140px;height:140px;border-radius:50%;border:3px solid var(--gold);
+  box-shadow:0 0 40px rgba(201,162,39,.3),0 0 0 6px rgba(201,162,39,.07);
+  overflow:hidden;position:relative;margin:0 auto 20px;transition:var(--tr);}
+.logo-ring.editable{cursor:pointer;}
+.logo-ring.editable:hover{box-shadow:0 0 40px rgba(168,85,247,.5),0 0 0 6px rgba(168,85,247,.12);}
+.logo-ring img{width:100%;height:100%;object-fit:cover;display:block;}
+.logo-empty{width:100%;height:100%;background:linear-gradient(135deg,#2d1540,#4c1d95);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;font-size:11px;color:var(--gold);text-align:center;padding:10px;}
+.logo-overlay{position:absolute;inset:0;background:rgba(107,33,168,.75);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;font-size:26px;}
+.logo-ring.editable:hover .logo-overlay{opacity:1;}
+.brand-name{font-family:'Fredoka One',cursive;font-size:clamp(52px,12vw,88px);
+  line-height:1;letter-spacing:-1px;
+  background:linear-gradient(160deg,#fff9e6 0%,var(--gold-l) 35%,#ff9d00 70%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 12px rgba(201,162,39,.4));}
+.brand-ribbon{display:inline-block;background:linear-gradient(90deg,transparent,rgba(255,150,0,.18),transparent);
+  border-top:1px solid rgba(255,150,0,.3);border-bottom:1px solid rgba(255,150,0,.3);
+  padding:4px 20px;margin-top:6px;}
+.brand-tagline{font-size:14px;letter-spacing:2px;color:var(--gold-l);font-style:italic;font-weight:500;}
+.admin-toggle-btn{position:absolute;top:14px;right:14px;background:transparent;
+  border:1px solid var(--border2);color:var(--muted);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;transition:.2s;}
+.admin-toggle-btn:hover{border-color:var(--purple-l);color:var(--purple-l);}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(8,5,16,.93);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);padding:0 16px;display:flex;justify-content:center;gap:4px;
+  overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav a{color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;
+  padding:14px 10px;border-bottom:2px solid transparent;transition:.25s;white-space:nowrap;}
+.nav a:hover,.nav a.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 auto;}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(26px,5vw,40px);font-weight:700;margin-bottom:6px;}
+.sec-title span{color:var(--gold);}
+.sec-sub{font-size:13px;color:var(--muted);margin-bottom:36px;}
+.sec-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:10px;}
+.sec-header .sec-title{margin-bottom:4px;}
+.sec-header .sec-sub{margin-bottom:0;}
+
+/* ── PRODUCTS ── */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:var(--tr);cursor:pointer;position:relative;}
+.pcard:not(.esgotado-card):hover{transform:translateY(-5px);border-color:rgba(201,162,39,.45);box-shadow:0 16px 48px rgba(107,33,168,.25);}
+.pcard.selected{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),0 16px 48px rgba(201,162,39,.2);}
+.sel-badge{position:absolute;top:10px;right:10px;background:var(--gold);color:#000;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;opacity:0;transition:.2s;z-index:5;}
+.pcard.selected .sel-badge{opacity:1;}
+
+/* ESGOTADO */
+.esgotado-card{opacity:.55;cursor:not-allowed;}
+.esgotado-card:hover{transform:none!important;box-shadow:none!important;border-color:var(--border)!important;}
+.esgotado-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:6;pointer-events:none;}
+.esgotado-tag{background:var(--red);color:#fff;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border-radius:6px;}
+.admin-esgotado-toggle{position:absolute;bottom:8px;right:8px;font-size:10px;padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:rgba(0,0,0,.5);color:var(--muted);cursor:pointer;display:none;z-index:10;font-family:'DM Sans',sans-serif;transition:.2s;}
+.admin-mode .admin-esgotado-toggle{display:block;}
+.admin-esgotado-toggle:hover{border-color:var(--red);color:#fca5a5;}
+.admin-esgotado-toggle.ativo{border-color:var(--green);color:#86efac;}
+
+.pimg-wrap{width:100%;height:150px;position:relative;overflow:hidden;}
+.pimg-wrap img{width:100%;height:100%;object-fit:cover;transition:.4s;}
+.pcard:not(.esgotado-card):hover .pimg-wrap img{transform:scale(1.06);}
+.pimg-ph{width:100%;height:100%;background:linear-gradient(135deg,#2a1245,#4c1d95 60%,#1e0f30);display:flex;align-items:center;justify-content:center;font-size:52px;}
+.pimg-edit-layer{position:absolute;inset:0;background:rgba(107,33,168,.78);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;opacity:0;transition:.2s;font-size:12px;color:#fff;pointer-events:none;}
+.pimg-edit-layer span{font-size:28px;}
+.pcard:hover .pimg-edit-layer.on{opacity:1;pointer-events:all;}
+.pbody{padding:14px 16px;}
+.psize{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.psub{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.price-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.price-old{font-size:12px;color:var(--muted);text-decoration:line-through;}
+.price-new{font-size:20px;font-weight:700;color:var(--gold-l);}
+.disc-badge{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+
+/* ADMIN CARD BTNS */
+.card-admin-btns{position:absolute;top:8px;left:8px;display:none;gap:4px;z-index:10;}
+.admin-mode .card-admin-btns{display:flex;}
+.cadmin-btn{width:28px;height:28px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:.2s;}
+.cadmin-btn.del{background:rgba(239,68,68,.85);color:#fff;}
+.cadmin-btn.del:hover{background:var(--red);}
+.cadmin-btn.edit{background:rgba(201,162,39,.85);color:#000;}
+.cadmin-btn.edit:hover{background:var(--gold-l);}
+
+/* ── COMPLEMENTS ── */
+#complementos{border-top:1px solid var(--border);}
+.comps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:12px;}
+.ccard{background:var(--card);border:1px solid var(--border2);border-radius:12px;overflow:hidden;cursor:pointer;transition:var(--tr);position:relative;}
+.ccard:hover{border-color:rgba(201,162,39,.3);}
+.ccard.selected{border-color:var(--gold);background:rgba(201,162,39,.07);}
+.cstrip{position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transition:.25s;transform-origin:left;}
+.ccard.selected .cstrip{transform:scaleX(1);}
+.cimg-wrap{width:100%;height:90px;position:relative;overflow:hidden;}
+.cimg-wrap img{width:100%;height:100%;object-fit:cover;}
+.cimg-ph{width:100%;height:100%;background:linear-gradient(135deg,#1e1126,#2d1540);display:flex;align-items:center;justify-content:center;font-size:32px;}
+.cimg-edit-layer{position:absolute;inset:0;background:rgba(107,33,168,.78);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;font-size:20px;pointer-events:none;}
+.ccard:hover .cimg-edit-layer.on{opacity:1;pointer-events:all;}
+.cbody{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.cname{font-size:12px;font-weight:500;}
+.cprice{font-size:12px;color:var(--gold);font-weight:600;white-space:nowrap;}
+.ccheck{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:.2s;}
+.ccard.selected .ccheck{background:var(--gold);border-color:var(--gold);color:#000;font-weight:bold;}
+.ccard-admin-btns{position:absolute;top:6px;left:6px;display:none;gap:4px;z-index:10;}
+.admin-mode .ccard-admin-btns{display:flex;}
+
+/* ADD CARD */
+.add-card{background:rgba(201,162,39,.05);border:2px dashed rgba(201,162,39,.25);border-radius:var(--r);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  min-height:200px;cursor:pointer;transition:var(--tr);color:var(--muted);}
+.add-card:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,162,39,.08);}
+.add-card-icon{font-size:32px;}
+.add-card-label{font-size:12px;letter-spacing:1px;text-transform:uppercase;}
+.add-comp-card{min-height:140px;}
+
+/* ── ORDER ── */
+#pedido{border-top:1px solid var(--border);}
+.order-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;}
+.order-empty{text-align:center;color:var(--muted);padding:20px;font-size:14px;line-height:1.8;}
+
+/* ANIMAÇÃO DAS LINHAS DO PEDIDO */
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideOut{from{opacity:1;max-height:60px;padding:10px 0;}to{opacity:0;max-height:0;padding:0;}}
+.order-line{display:flex;justify-content:space-between;align-items:center;padding:10px 0;
+  border-bottom:1px solid var(--border2);font-size:14px;gap:8px;
+  animation:slideIn .25s ease both;}
+.order-line-info{flex:1;}
+.order-line-name{font-weight:500;}
+.order-line-price{color:var(--gold-l);font-size:13px;white-space:nowrap;margin-top:2px;}
+.order-line-remove{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#fca5a5;
+  border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;white-space:nowrap;transition:.2s;font-family:'DM Sans',sans-serif;flex-shrink:0;}
+.order-line-remove:hover{background:rgba(239,68,68,.3);border-color:var(--red);}
+.order-total{display:flex;justify-content:space-between;padding:16px 0 0;font-size:18px;font-weight:700;color:var(--gold-l);animation:slideIn .3s ease both;}
+.del-toggle{display:flex;gap:10px;margin:16px 0;}
+.del-btn{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:.2s;}
+.del-btn.active{border-color:var(--gold);color:var(--gold-l);background:var(--gold-dim);}
+.obs-area{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 16px;margin-top:12px;resize:none;outline:none;transition:.2s;}
+.obs-area:focus{border-color:rgba(201,162,39,.4);}
+.obs-area::placeholder{color:var(--muted);}
+.btn-pix{width:100%;margin-top:16px;background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#000;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--tr);}
+.btn-pix:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,162,39,.3);}
+.btn-pix:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+
+/* ── PIX ── */
+.pix-section{background:linear-gradient(135deg,rgba(201,162,39,.07),rgba(107,33,168,.07));border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:20px;display:none;}
+.pix-section.open{display:block;}
+.pix-head{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px;}
+.pix-desc{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.pix-key-row{background:rgba(0,0,0,.3);border:1px dashed var(--gold);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;}
+.pix-key-text{font-size:15px;font-weight:600;color:var(--gold-l);word-break:break-all;}
+.copy-btn{background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold-l);border-radius:8px;padding:6px 14px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:.2s;}
+.copy-btn.ok{background:rgba(34,197,94,.15);border-color:var(--green);color:#86efac;}
+.pix-valor{text-align:center;margin:16px 0;}
+.pix-valor small{font-size:12px;color:var(--muted);}
+.pix-valor strong{font-size:30px;color:var(--gold-l);display:block;}
+.pix-steps{list-style:none;margin:14px 0;display:flex;flex-direction:column;gap:8px;}
+.pix-steps li{font-size:13px;color:var(--muted);display:flex;align-items:flex-start;gap:10px;line-height:1.5;}
+.pix-steps li .n{background:var(--gold-dim);border:1px solid var(--border);min-width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);flex-shrink:0;margin-top:1px;}
+.btn-confirmado{width:100%;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;border-radius:12px;padding:16px;font-size:16px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:var(--tr);margin-top:16px;}
+.btn-confirmado:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(37,211,102,.3);}
+
+/* ── INFO ── */
+#info{border-top:1px solid var(--border);}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.icard{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:18px;display:flex;gap:14px;position:relative;}
+.iicon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.ilabel{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;}
+.ivalue{font-size:13px;line-height:1.6;}
+.ivalue a{color:var(--gold-l);text-decoration:none;}
+.icard-edit-btn{position:absolute;top:10px;right:10px;background:rgba(201,162,39,.15);border:1px solid rgba(201,162,39,.3);color:var(--gold-l);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;display:none;font-family:'DM Sans',sans-serif;transition:.2s;}
+.admin-mode .icard-edit-btn{display:block;}
+.icard-edit-btn:hover{background:rgba(201,162,39,.3);}
+
+/* ── FLOAT ── */
+.float-btn{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#000;border:none;border-radius:50px;padding:13px 20px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:none;align-items:center;gap:8px;z-index:200;box-shadow:0 8px 24px rgba(201,162,39,.4);transition:var(--tr);}
+.float-btn:hover{transform:scale(1.04);}
+.float-btn.show{display:flex;}
+.float-badge{background:#000;color:var(--gold-l);font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+/* ── MODALS ── */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.25s;}
+.moverlay.open{opacity:1;pointer-events:all;}
+.mbox{background:var(--card2);border:1px solid var(--border);border-radius:var(--r);padding:28px;max-width:460px;width:100%;max-height:90vh;overflow-y:auto;}
+.mbox h3{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:6px;}
+.mbox p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;}
+.mfield{margin-bottom:12px;}
+.mfield label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;}
+.minput{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:12px 16px;outline:none;transition:.2s;}
+.minput:focus{border-color:rgba(201,162,39,.4);}
+.minput::placeholder{color:var(--muted);}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.merror{color:#fca5a5;font-size:12px;margin-bottom:10px;display:none;}
+.mactions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
+.mbtn{border:1px solid var(--border2);background:transparent;color:var(--text);border-radius:8px;padding:8px 18px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:.2s;}
+.mbtn.primary{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700;}
+.mbtn.primary:hover{background:var(--gold-l);}
+.mbtn.red{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.4);color:#fca5a5;}
+.mbtn.green{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.4);color:#86efac;}
+
+/* MODAL CONFIRMAÇÃO PEDIDO */
+.confirm-order-items{background:rgba(0,0,0,.3);border-radius:10px;padding:16px;margin-bottom:16px;}
+.confirm-item{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px solid var(--border2);}
+.confirm-item:last-child{border-bottom:none;}
+.confirm-total{display:flex;justify-content:space-between;padding:12px 16px;background:var(--gold-dim);border:1px solid var(--border);border-radius:10px;font-size:16px;font-weight:700;color:var(--gold-l);}
+.confirm-tipo{text-align:center;font-size:12px;color:var(--muted);margin:10px 0;}
+
+footer{position:relative;z-index:1;text-align:center;padding:28px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;line-height:1.8;}
+footer span{color:var(--gold);}
+.footer-horario{font-size:13px;color:var(--text);margin-bottom:4px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.hero{animation:fadeUp .7s ease both;}
+.pcard{animation:fadeUp .5s ease both;}
+.pcard:nth-child(1){animation-delay:.05s;}.pcard:nth-child(2){animation-delay:.1s;}
+.pcard:nth-child(3){animation-delay:.15s;}.pcard:nth-child(4){animation-delay:.2s;}
+
+@media(max-width:500px){
+  .products-grid{grid-template-columns:repeat(2,1fr);}
+  .comps-grid{grid-template-columns:repeat(2,1fr);}
+  .info-grid{grid-template-columns:1fr;}
+  .admin-btns{gap:4px;}
+  .abtn{padding:5px 8px;font-size:10px;}
+  .mrow{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ADMIN BAR -->
+<div class="admin-bar" id="adminBar">
+  <span class="admin-bar-title">✏️ Modo Edição</span>
+  <div class="admin-btns">
+    <button class="abtn danger" onclick="resetAll()">🗑 Resetar</button>
+    <button class="abtn" onclick="abrirModalPix()">💳 Chave PIX</button>
+    <button class="abtn" onclick="abrirModalHorario()">🕐 Horário</button>
+    <button class="abtn save" onclick="sairAdmin()">✅ Salvar & Sair</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero" id="heroEl">
+  <button class="admin-toggle-btn" id="adminToggle" onclick="abrirModalAdmin()">⚙️ Admin</button>
+  <div class="logo-ring" id="logoRing" onclick="clickLogo()">
+    <div class="logo-empty" id="logoEmpty">Toque para<br>adicionar logo</div>
+    <img id="logoImg" src="" alt="Logo" style="display:none">
+    <div class="logo-overlay">📷</div>
+  </div>
+  <div class="brand-name">Açaví</div>
+  <div class="brand-ribbon">
+    <span class="brand-tagline">Puro, intenso, inesquecível!</span>
+  </div>
+  <input type="file" id="logoFile" accept="image/*" onchange="onLogoUpload(event)">
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="mainNav">
+  <a href="#produtos" class="active">Cardápio</a>
+  <a href="#complementos">Complementos</a>
+  <a href="#pedido">Meu Pedido</a>
+  <a href="#info">Entrega</a>
+</nav>
+
+<!-- PRODUTOS -->
+<section id="produtos">
+  <div class="sec-header">
+    <div><div class="sec-title">Açaí <span>Premium</span></div><div class="sec-sub" style="margin-bottom:0">Selecione o tamanho desejado</div></div>
+  </div>
+  <div class="products-grid" id="prodGrid"></div>
+</section>
+
+<!-- COMPLEMENTOS -->
+<section id="complementos">
+  <div class="sec-header">
+    <div><div class="sec-title"><span>Complementos</span></div><div class="sec-sub" style="margin-bottom:0">Clique para adicionar ao seu pedido</div></div>
+  </div>
+  <div class="comps-grid" id="compGrid"></div>
+</section>
+
+<!-- PEDIDO -->
+<section id="pedido">
+  <div class="sec-title">Meu <span>Pedido</span></div>
+  <div class="sec-sub">Confira e edite antes de finalizar</div>
+  <div class="order-box">
+    <div id="orderLines"><div class="order-empty">Nenhum item selecionado ainda.<br>Escolha um tamanho acima! 🍇</div></div>
+    <div class="del-toggle" id="delToggle" style="display:none">
+      <button class="del-btn active" id="btnRet" onclick="setDel('retirada')">🏪 Retirar no local</button>
+      <button class="del-btn" id="btnEnt" onclick="setDel('entrega')">🛵 Delivery +R$6,99</button>
+    </div>
+    <textarea class="obs-area" id="obsArea" rows="2" placeholder="Endereço de entrega, observações..." style="display:none"></textarea>
+    <button class="btn-pix" id="btnPagar" onclick="abrirConfirmacaoPedido()" disabled>💳 Pagar via PIX</button>
+  </div>
+  <div class="pix-section" id="pixSection">
+    <div class="pix-head">Pagamento via <span style="color:var(--gold)">PIX</span></div>
+    <div class="pix-desc">Copie a chave, pague no seu banco e clique em confirmar</div>
+    <div class="pix-key-row">
+      <span class="pix-key-text" id="pixKeyShow">—</span>
+      <button class="copy-btn" id="copyBtn" onclick="copiarPix()">Copiar</button>
+    </div>
+    <div class="pix-valor"><small>Valor a pagar:</small><strong id="pixValor">R$ 0,00</strong></div>
+    <ul class="pix-steps">
+      <li><span class="n">1</span>Abra seu banco ou app de pagamento</li>
+      <li><span class="n">2</span>Escolha <strong>Pagar com PIX</strong> e cole a chave copiada</li>
+      <li><span class="n">3</span>Confirme o valor exato e finalize o pagamento</li>
+      <li><span class="n">4</span>Após pagar, clique no botão abaixo ✅</li>
+    </ul>
+    <button class="btn-confirmado" onclick="enviarWhats()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      ✅ Já paguei! Enviar pedido pelo WhatsApp
+    </button>
+  </div>
+</section>
+
+<!-- INFO -->
+<section id="info">
+  <div class="sec-title">Entrega & <span>Contato</span></div>
+  <div class="sec-sub">Como receber ou retirar seu pedido</div>
+  <div class="info-grid">
+    <div class="icard">
+      <div class="iicon">📱</div>
+      <div><div class="ilabel">WhatsApp</div><div class="ivalue"><a href="https://wa.me/5531997892312">(31) 99789-2312</a><br><a href="https://wa.me/5531996968394">(31) 99696-8394</a></div></div>
+    </div>
+    <div class="icard">
+      <div class="iicon">📍</div>
+      <div><div class="ilabel">Retirada no local</div><div class="ivalue">Rua Osmar da Silva Araújo, Nº 296<br>Bairro Maria José — Vespasiano/MG</div></div>
+    </div>
+    <div class="icard">
+      <div class="iicon">🛵</div>
+      <div><div class="ilabel">Taxa de entrega</div><div class="ivalue">R$ 6,99 — Região de Vespasiano/MG</div></div>
+    </div>
+    <div class="icard">
+      <div class="iicon">💳</div>
+      <div><div class="ilabel">Formas de pagamento</div><div class="ivalue">PIX • Dinheiro • Cartão</div></div>
+    </div>
+    <div class="icard" id="icardHorario">
+      <div class="iicon">🕐</div>
+      <div style="flex:1">
+        <div class="ilabel">Horário de funcionamento</div>
+        <div class="ivalue" id="horarioDisplay">—</div>
+      </div>
+      <button class="icard-edit-btn" onclick="abrirModalHorario()">✏️ Editar</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-horario" id="footerHorario"></div>
+  Feito com 💜 para a <span>Açaví</span> — Vespasiano/MG
+</footer>
+
+<!-- FLOAT BTN com badge -->
+<button class="float-btn" id="floatBtn" onclick="document.getElementById('pedido').scrollIntoView({behavior:'smooth'})">
+  🛒 <span id="floatVal">R$0,00</span>
+  <span class="float-badge" id="floatBadge">0</span>
+</button>
+
+<!-- ════ MODAIS ════ -->
+
+<!-- LOGIN ADMIN -->
+<div class="moverlay" id="modAdmin">
+  <div class="mbox">
+    <h3>Modo Edição</h3>
+    <p>Digite a senha para editar o cardápio</p>
+    <div class="mfield"><input class="minput" type="password" id="passInput" placeholder="Senha" onkeydown="if(event.key==='Enter')verificarSenha()"></div>
+    <div class="merror" id="passErro">Senha incorreta.</div>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modAdmin')">Cancelar</button>
+      <button class="mbtn primary" onclick="verificarSenha()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIX -->
+<div class="moverlay" id="modPix">
+  <div class="mbox">
+    <h3>Alterar Chave PIX</h3>
+    <p>CPF, telefone com DDD, e-mail ou chave aleatória</p>
+    <div class="mfield"><label>Chave PIX</label><input class="minput" id="pixInput" placeholder="Ex: 31997892312" onkeydown="if(event.key==='Enter')salvarPix()"></div>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modPix')">Cancelar</button>
+      <button class="mbtn primary" onclick="salvarPix()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- HORÁRIO -->
+<div class="moverlay" id="modHorario">
+  <div class="mbox">
+    <h3>Horário de Funcionamento</h3>
+    <p>Informe seus dias e horários de atendimento</p>
+    <div class="mfield"><label>Dias</label><input class="minput" id="horarioDias" placeholder="Ex: Seg a Sex / Todos os dias"></div>
+    <div class="mrow">
+      <div class="mfield"><label>Abertura</label><input class="minput" id="horarioAbre" placeholder="Ex: 14:00"></div>
+      <div class="mfield"><label>Fechamento</label><input class="minput" id="horarioFecha" placeholder="Ex: 22:00"></div>
+    </div>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modHorario')">Cancelar</button>
+      <button class="mbtn primary" onclick="salvarHorario()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO PRODUTO -->
+<div class="moverlay" id="modNovoProd">
+  <div class="mbox">
+    <h3 id="modalProdTitle">Adicionar Produto</h3>
+    <p>Preencha os dados do produto</p>
+    <div class="mfield"><label>Tamanho / Nome</label><input class="minput" id="npTamanho" placeholder="Ex: 400ml ou Tigela Grande"></div>
+    <div class="mrow">
+      <div class="mfield"><label>Preço normal (R$)</label><input class="minput" id="npPrecoAnt" type="number" step="0.01" placeholder="Ex: 22.00"></div>
+      <div class="mfield"><label>Preço com desconto (R$)</label><input class="minput" id="npPreco" type="number" step="0.01" placeholder="Ex: 16.00"></div>
+    </div>
+    <div class="mfield"><label>Subtítulo</label><input class="minput" id="npNome" placeholder="Açaí Premium" value="Açaí Premium"></div>
+    <input type="hidden" id="npEditId">
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modNovoProd')">Cancelar</button>
+      <button class="mbtn primary" id="npSaveBtn" onclick="salvarProduto()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOVO COMPLEMENTO -->
+<div class="moverlay" id="modNovoComp">
+  <div class="mbox">
+    <h3 id="modalCompTitle">Adicionar Complemento</h3>
+    <p>Preencha os dados do complemento</p>
+    <div class="mfield"><label>Nome</label><input class="minput" id="ncNome" placeholder="Ex: Paçoca"></div>
+    <div class="mfield"><label>Preço (R$)</label><input class="minput" id="ncPreco" type="number" step="0.01" placeholder="Ex: 3.50"></div>
+    <input type="hidden" id="ncEditId">
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modNovoComp')">Cancelar</button>
+      <button class="mbtn primary" id="ncSaveBtn" onclick="salvarComplemento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMAR DELETE -->
+<div class="moverlay" id="modConfirmDel">
+  <div class="mbox">
+    <h3>Confirmar remoção</h3>
+    <p id="confirmDelMsg"></p>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modConfirmDel')">Cancelar</button>
+      <button class="mbtn red" id="confirmDelBtn">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMAÇÃO DO PEDIDO -->
+<div class="moverlay" id="modConfirmPedido">
+  <div class="mbox">
+    <h3>Confirmar Pedido</h3>
+    <p>Revise seu pedido antes de prosseguir para o pagamento</p>
+    <div class="confirm-order-items" id="confirmOrderItems"></div>
+    <div class="confirm-total" id="confirmTotal"></div>
+    <div class="confirm-tipo" id="confirmTipo"></div>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modConfirmPedido')">← Voltar e editar</button>
+      <button class="mbtn green" onclick="confirmarEPagar()">✅ Confirmar e Pagar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════
+const WA_NUM       = "5531997892312";
+const ADMIN_SENHA  = "acaavi2024"; // ← Troque pela sua senha!
+const TAXA_ENTREGA = 6.99;
+const IMG_MAX_W    = 700;
+const IMG_QUALITY  = 0.72;
+const CFG_KEY      = 'acaavi_cfg_v4';
+const PROD_KEY     = 'acaavi_prods_v4';
+const COMP_KEY     = 'acaavi_comps_v4';
+
+// ══════════════════════════════════════════════════
+// INDEXEDDB
+// ══════════════════════════════════════════════════
+let db = null;
+function abrirDB(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open('acaavi_imgs_v3',1);
+    r.onupgradeneeded=e=>e.target.result.createObjectStore('imgs');
+    r.onsuccess=e=>{db=e.target.result;res();};
+    r.onerror=()=>rej();
+  });
+}
+const dbSet=(k,v)=>new Promise((res,rej)=>{if(!db)return rej();const tx=db.transaction('imgs','readwrite');tx.objectStore('imgs').put(v,k);tx.oncomplete=res;tx.onerror=rej;});
+const dbGet=(k)=>new Promise(res=>{if(!db)return res(null);const tx=db.transaction('imgs','readonly');const r=tx.objectStore('imgs').get(k);r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null);});
+const dbDel=(k)=>new Promise(res=>{if(!db)return res();const tx=db.transaction('imgs','readwrite');tx.objectStore('imgs').delete(k);tx.oncomplete=res;tx.onerror=res;});
+const dbKeys=()=>new Promise(res=>{if(!db)return res([]);const tx=db.transaction('imgs','readonly');const r=tx.objectStore('imgs').getAllKeys();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>res([]);});
+
+// ══════════════════════════════════════════════════
+// COMPRESSÃO
+// ══════════════════════════════════════════════════
+function comprimirImg(file){
+  return new Promise(res=>{
+    const fr=new FileReader();
+    fr.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>IMG_MAX_W){h=Math.round(h*IMG_MAX_W/w);w=IMG_MAX_W;}
+        const c=document.createElement('canvas');
+        c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg',IMG_QUALITY));
+      };
+      img.src=e.target.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// LOCALSTORAGE
+// ══════════════════════════════════════════════════
+const lsGet=(k,d)=>{try{const r=localStorage.getItem(k);return r?JSON.parse(r):d;}catch{return d;}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{return false;}};
+
+let cfg = lsGet(CFG_KEY,{pixChave:'31997892312',horario:null});
+
+function prodPadrao(){return[
+  {id:'p300',tamanho:'300ml',  nome:'Açaí Premium',preco:13.99,precoAnt:19.99,esgotado:false},
+  {id:'p500',tamanho:'500ml',  nome:'Açaí Premium',preco:18.99,precoAnt:24.99,esgotado:false},
+  {id:'p750',tamanho:'750ml',  nome:'Açaí Premium',preco:24.99,precoAnt:29.99,esgotado:false},
+  {id:'p1l', tamanho:'1 Litro',nome:'Açaí Premium',preco:29.99,precoAnt:34.99,esgotado:false},
+];}
+function compPadrao(){return[
+  {id:'c1',nome:'Leite condensado',preco:4.00},
+  {id:'c2',nome:'Leite em pó',     preco:4.00},
+  {id:'c3',nome:'Morango',         preco:4.00},
+  {id:'c4',nome:'Banana',          preco:3.00},
+  {id:'c5',nome:'Manga',           preco:3.00},
+  {id:'c6',nome:'Granola',         preco:4.00},
+];}
+
+let produtos     = lsGet(PROD_KEY, prodPadrao());
+let complementos = lsGet(COMP_KEY, compPadrao());
+const imgCache   = {};
+
+// ══════════════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════════════
+let modoAdmin   = false;
+let tipoEntrega = 'retirada';
+let prodSel     = null;
+let compsSel    = new Set();
+
+// ══════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════
+let toastT;
+function toast(msg,tipo='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show '+tipo;
+  clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',3000);
+}
+
+// ══════════════════════════════════════════════════
+// FORMAT
+// ══════════════════════════════════════════════════
+const fmt  = v=>'R$ '+v.toFixed(2).replace('.',',');
+const desc = (a,b)=>Math.round((1-b/a)*100)+'% OFF';
+const uid  = ()=>'x'+Math.random().toString(36).slice(2,8);
+const emoji= n=>{n=n.toLowerCase();
+  if(n.includes('morango'))return'🍓';if(n.includes('banana'))return'🍌';
+  if(n.includes('manga'))return'🥭';if(n.includes('granola'))return'🌾';
+  if(n.includes('leite'))return'🥛';return'🍨';};
+
+// ══════════════════════════════════════════════════
+// LOGO
+// ══════════════════════════════════════════════════
+function clickLogo(){if(modoAdmin)document.getElementById('logoFile').click();}
+async function onLogoUpload(e){
+  const f=e.target.files[0];if(!f)return;
+  toast('Salvando logo...','ok');
+  const d=await comprimirImg(f);
+  await dbSet('logo',d);imgCache['logo']=d;
+  renderLogo();toast('✅ Logo salva!','ok');
+}
+function renderLogo(){
+  const img=document.getElementById('logoImg');
+  const emp=document.getElementById('logoEmpty');
+  const ring=document.getElementById('logoRing');
+  const src=imgCache['logo']||null;
+  if(src){img.src=src;img.style.display='block';emp.style.display='none';}
+  else{img.style.display='none';emp.style.display='flex';}
+  ring.classList.toggle('editable',modoAdmin);
+}
+
+// ══════════════════════════════════════════════════
+// RENDER PRODUTOS
+// ══════════════════════════════════════════════════
+function renderProdutos(){
+  const g=document.getElementById('prodGrid');g.innerHTML='';
+  produtos.forEach(p=>{
+    const sel=prodSel&&prodSel.id===p.id;
+    const src=imgCache[p.id]||null;
+    const esgt=!!p.esgotado;
+    const d=document.createElement('div');
+    d.className='pcard'+(sel?' selected':'')+(esgt?' esgotado-card':'');
+    d.id='pcard-'+p.id;
+    d.innerHTML=`
+      <div class="sel-badge">✓</div>
+      ${esgt?`<div class="esgotado-overlay"><span class="esgotado-tag">Esgotado</span></div>`:''}
+      <div class="card-admin-btns">
+        <button class="cadmin-btn del" title="Remover" onclick="event.stopPropagation();confirmarDel('prod','${p.id}','${p.tamanho}')">✕</button>
+        <button class="cadmin-btn edit" title="Editar" onclick="event.stopPropagation();abrirEditProd('${p.id}')">✏</button>
+      </div>
+      <div class="pimg-wrap">
+        ${src?`<img src="${src}" alt="${p.nome}">`:`<div class="pimg-ph">🍇</div>`}
+        <div class="pimg-edit-layer ${modoAdmin?'on':''}" onclick="event.stopPropagation();document.getElementById('pf-${p.id}').click()">
+          <span>📷</span>Trocar foto
+        </div>
+      </div>
+      <div class="pbody">
+        <div class="psize">${p.tamanho}</div>
+        <div class="psub">${p.nome}</div>
+        <div class="price-row">
+          <span class="price-old">${fmt(p.precoAnt)}</span>
+          <span class="price-new">${fmt(p.preco)}</span>
+          <span class="disc-badge">${desc(p.precoAnt,p.preco)}</span>
+        </div>
+      </div>
+      <button class="admin-esgotado-toggle ${!esgt?'ativo':''}" onclick="event.stopPropagation();toggleEsgotado('${p.id}')">
+        ${esgt?'✅ Disponível':'⛔ Esgotado'}
+      </button>
+      <input type="file" id="pf-${p.id}" accept="image/*" onchange="uploadProdImg(event,'${p.id}')">
+    `;
+    d.addEventListener('click',()=>{if(!modoAdmin&&!esgt)selecionarProd(p);});
+    g.appendChild(d);
+  });
+  if(modoAdmin){
+    const add=document.createElement('div');
+    add.className='pcard add-card';
+    add.innerHTML=`<div class="add-card-icon">＋</div><div class="add-card-label">Novo produto</div>`;
+    add.onclick=()=>abrirNovoProd();
+    g.appendChild(add);
+  }
+  document.body.classList.toggle('admin-mode',modoAdmin);
+}
+
+async function uploadProdImg(e,id){
+  const f=e.target.files[0];if(!f)return;
+  toast('Salvando foto...','ok');
+  try{const d=await comprimirImg(f);await dbSet(id,d);imgCache[id]=d;renderProdutos();toast('✅ Foto salva!','ok');}
+  catch{toast('❌ Erro ao salvar foto.','err');}
+}
+
+function toggleEsgotado(id){
+  const p=produtos.find(x=>x.id===id);if(!p)return;
+  p.esgotado=!p.esgotado;
+  lsSet(PROD_KEY,produtos);
+  if(prodSel&&prodSel.id===id&&p.esgotado){prodSel=null;atualizarPedido();}
+  renderProdutos();
+  toast(p.esgotado?'⛔ Marcado como esgotado':'✅ Produto disponível novamente','ok');
+}
+
+// ══════════════════════════════════════════════════
+// RENDER COMPLEMENTOS
+// ══════════════════════════════════════════════════
+function renderComplementos(){
+  const g=document.getElementById('compGrid');g.innerHTML='';
+  complementos.forEach(c=>{
+    const sel=compsSel.has(c.id);
+    const src=imgCache[c.id]||null;
+    const d=document.createElement('div');
+    d.className='ccard'+(sel?' selected':'');
+    d.id='ccard-'+c.id;
+    d.innerHTML=`
+      <div class="cstrip"></div>
+      <div class="ccard-admin-btns">
+        <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('comp','${c.id}','${c.nome}')">✕</button>
+        <button class="cadmin-btn edit" onclick="event.stopPropagation();abrirEditComp('${c.id}')">✏</button>
+      </div>
+      <div class="cimg-wrap">
+        ${src?`<img src="${src}" alt="${c.nome}">`:`<div class="cimg-ph">${emoji(c.nome)}</div>`}
+        <div class="cimg-edit-layer ${modoAdmin?'on':''}" onclick="event.stopPropagation();document.getElementById('cf-${c.id}').click()">📷</div>
+      </div>
+      <div class="cbody">
+        <div><div class="cname">${c.nome}</div><div class="cprice">+${fmt(c.preco)}</div></div>
+        <div class="ccheck">${sel?'✓':''}</div>
+      </div>
+      <input type="file" id="cf-${c.id}" accept="image/*" onchange="uploadCompImg(event,'${c.id}')">
+    `;
+    d.addEventListener('click',()=>{if(!modoAdmin)toggleComp(c);});
+    g.appendChild(d);
+  });
+  if(modoAdmin){
+    const add=document.createElement('div');
+    add.className='ccard add-card add-comp-card';
+    add.innerHTML=`<div class="add-card-icon">＋</div><div class="add-card-label">Novo complemento</div>`;
+    add.onclick=()=>abrirNovoComp();
+    g.appendChild(add);
+  }
+}
+
+async function uploadCompImg(e,id){
+  const f=e.target.files[0];if(!f)return;
+  toast('Salvando foto...','ok');
+  try{const d=await comprimirImg(f);await dbSet(id,d);imgCache[id]=d;renderComplementos();toast('✅ Foto salva!','ok');}
+  catch{toast('❌ Erro ao salvar foto.','err');}
+}
+
+// ══════════════════════════════════════════════════
+// SELEÇÃO
+// ══════════════════════════════════════════════════
+function selecionarProd(p){
+  prodSel=(prodSel&&prodSel.id===p.id)?null:p;
+  renderProdutos();atualizarPedido();
+}
+function toggleComp(c){
+  if(compsSel.has(c.id))compsSel.delete(c.id);else compsSel.add(c.id);
+  renderComplementos();atualizarPedido();
+}
+function removerProdPedido(){prodSel=null;renderProdutos();atualizarPedido();}
+function removerCompPedido(id){compsSel.delete(id);renderComplementos();atualizarPedido();}
+
+// ══════════════════════════════════════════════════
+// PEDIDO
+// ══════════════════════════════════════════════════
+function setDel(tipo){
+  tipoEntrega=tipo;
+  document.getElementById('btnRet').classList.toggle('active',tipo==='retirada');
+  document.getElementById('btnEnt').classList.toggle('active',tipo==='entrega');
+  atualizarPedido();
+}
+function calcTotal(){
+  if(!prodSel)return 0;
+  let t=prodSel.preco;
+  complementos.forEach(c=>{if(compsSel.has(c.id))t+=c.preco;});
+  if(tipoEntrega==='entrega')t+=TAXA_ENTREGA;
+  return t;
+}
+function contarItens(){
+  if(!prodSel)return 0;
+  return 1+compsSel.size;
+}
+function atualizarPedido(){
+  const lines=document.getElementById('orderLines');
+  const btnP=document.getElementById('btnPagar');
+  const delt=document.getElementById('delToggle');
+  const obs=document.getElementById('obsArea');
+  const flt=document.getElementById('floatBtn');
+  const fval=document.getElementById('floatVal');
+  const fbadge=document.getElementById('floatBadge');
+  const pixS=document.getElementById('pixSection');
+
+  if(!prodSel){
+    lines.innerHTML='<div class="order-empty">Nenhum item selecionado ainda.<br>Escolha um tamanho acima! 🍇</div>';
+    btnP.disabled=true;delt.style.display='none';obs.style.display='none';
+    flt.classList.remove('show');pixS.classList.remove('open');return;
+  }
+
+  let total=prodSel.preco;
+  const scs=complementos.filter(c=>compsSel.has(c.id));
+  let html=`
+    <div class="order-line">
+      <div class="order-line-info">
+        <div class="order-line-name">🍇 ${prodSel.nome} ${prodSel.tamanho}</div>
+        <div class="order-line-price">${fmt(prodSel.preco)}</div>
+      </div>
+      <button class="order-line-remove" onclick="removerProdPedido()">✕ Remover</button>
+    </div>`;
+
+  scs.forEach(c=>{
+    total+=c.preco;
+    html+=`
+      <div class="order-line">
+        <div class="order-line-info">
+          <div class="order-line-name">+ ${c.nome}</div>
+          <div class="order-line-price">${fmt(c.preco)}</div>
+        </div>
+        <button class="order-line-remove" onclick="removerCompPedido('${c.id}')">✕ Remover</button>
+      </div>`;
+  });
+
+  if(tipoEntrega==='entrega'){
+    total+=TAXA_ENTREGA;
+    html+=`<div class="order-line"><div class="order-line-info"><div class="order-line-name">🛵 Taxa de entrega</div><div class="order-line-price">${fmt(TAXA_ENTREGA)}</div></div></div>`;
+  }
+  html+=`<div class="order-total"><span>Total</span><span>${fmt(total)}</span></div>`;
+  lines.innerHTML=html;
+  btnP.disabled=false;delt.style.display='flex';obs.style.display='block';
+  flt.classList.add('show');
+  fval.textContent=fmt(total);
+  fbadge.textContent=contarItens();
+}
+
+// ══════════════════════════════════════════════════
+// CONFIRMAÇÃO DO PEDIDO (modal antes do PIX)
+// ══════════════════════════════════════════════════
+function abrirConfirmacaoPedido(){
+  if(!prodSel)return;
+  const scs=complementos.filter(c=>compsSel.has(c.id));
+  const total=calcTotal();
+
+  let html=`<div class="confirm-item"><span>🍇 ${prodSel.nome} ${prodSel.tamanho}</span><span>${fmt(prodSel.preco)}</span></div>`;
+  scs.forEach(c=>{html+=`<div class="confirm-item"><span>+ ${c.nome}</span><span>${fmt(c.preco)}</span></div>`;});
+  if(tipoEntrega==='entrega'){html+=`<div class="confirm-item"><span>🛵 Entrega</span><span>${fmt(TAXA_ENTREGA)}</span></div>`;}
+
+  document.getElementById('confirmOrderItems').innerHTML=html;
+  document.getElementById('confirmTotal').innerHTML=`<span>Total a pagar</span><span>${fmt(total)}</span>`;
+  document.getElementById('confirmTipo').textContent=tipoEntrega==='entrega'?'🛵 Pedido com entrega':'🏪 Retirada no local';
+  abrirModal('modConfirmPedido');
+}
+
+function confirmarEPagar(){
+  fecharModal('modConfirmPedido');
+  const total=calcTotal();
+  document.getElementById('pixKeyShow').textContent=cfg.pixChave||'(não configurada)';
+  document.getElementById('pixValor').textContent=fmt(total);
+  const s=document.getElementById('pixSection');
+  s.classList.add('open');
+  s.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ══════════════════════════════════════════════════
+// PIX
+// ══════════════════════════════════════════════════
+function copiarPix(){
+  navigator.clipboard.writeText(cfg.pixChave||'').catch(()=>{});
+  const b=document.getElementById('copyBtn');
+  b.textContent='✓ Copiado!';b.classList.add('ok');
+  setTimeout(()=>{b.textContent='Copiar';b.classList.remove('ok');},2500);
+}
+function enviarWhats(){
+  if(!prodSel)return;
+  const obs=document.getElementById('obsArea').value.trim();
+  const scs=complementos.filter(c=>compsSel.has(c.id));
+  const total=calcTotal();
+  let msg=`🍇 *Pedido Açaví*\n\n*${prodSel.nome} ${prodSel.tamanho}* — ${fmt(prodSel.preco)}\n`;
+  if(scs.length){msg+=`\n*Complementos:*\n`;scs.forEach(c=>{msg+=`• ${c.nome} — ${fmt(c.preco)}\n`;});}
+  if(tipoEntrega==='entrega')msg+=`\n🛵 Taxa de entrega: ${fmt(TAXA_ENTREGA)}\n`;
+  msg+=`\n💳 *Total pago via PIX: ${fmt(total)}*`;
+  msg+=`\n📋 *Tipo:* ${tipoEntrega==='entrega'?'Delivery':'Retirada no local'}`;
+  if(obs)msg+=`\n\n📝 *Obs:* ${obs}`;
+  window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// ══════════════════════════════════════════════════
+// HORÁRIO
+// ══════════════════════════════════════════════════
+function renderHorario(){
+  const h=cfg.horario;
+  const disp=document.getElementById('horarioDisplay');
+  const footer=document.getElementById('footerHorario');
+  if(h&&h.dias&&h.abre&&h.fecha){
+    const txt=`${h.dias} • ${h.abre} às ${h.fecha}`;
+    disp.textContent=txt;
+    footer.textContent=`🕐 ${txt}`;
+  } else {
+    disp.textContent='Não informado';
+    footer.textContent='';
+  }
+}
+function abrirModalHorario(){
+  const h=cfg.horario||{};
+  document.getElementById('horarioDias').value=h.dias||'';
+  document.getElementById('horarioAbre').value=h.abre||'';
+  document.getElementById('horarioFecha').value=h.fecha||'';
+  abrirModal('modHorario');
+}
+function salvarHorario(){
+  cfg.horario={
+    dias:document.getElementById('horarioDias').value.trim(),
+    abre:document.getElementById('horarioAbre').value.trim(),
+    fecha:document.getElementById('horarioFecha').value.trim()
+  };
+  lsSet(CFG_KEY,cfg);renderHorario();fecharModal('modHorario');
+  toast('✅ Horário salvo!','ok');
+}
+
+// ══════════════════════════════════════════════════
+// ADD / EDIT PRODUTO
+// ══════════════════════════════════════════════════
+function abrirNovoProd(){
+  document.getElementById('modalProdTitle').textContent='Adicionar Produto';
+  document.getElementById('npSaveBtn').textContent='Adicionar';
+  document.getElementById('npTamanho').value='';
+  document.getElementById('npPrecoAnt').value='';
+  document.getElementById('npPreco').value='';
+  document.getElementById('npNome').value='Açaí Premium';
+  document.getElementById('npEditId').value='';
+  abrirModal('modNovoProd');
+}
+function abrirEditProd(id){
+  const p=produtos.find(x=>x.id===id);if(!p)return;
+  document.getElementById('modalProdTitle').textContent='Editar Produto';
+  document.getElementById('npSaveBtn').textContent='Salvar alterações';
+  document.getElementById('npTamanho').value=p.tamanho;
+  document.getElementById('npPrecoAnt').value=p.precoAnt;
+  document.getElementById('npPreco').value=p.preco;
+  document.getElementById('npNome').value=p.nome;
+  document.getElementById('npEditId').value=id;
+  abrirModal('modNovoProd');
+}
+function salvarProduto(){
+  const tam=document.getElementById('npTamanho').value.trim();
+  const pA=parseFloat(document.getElementById('npPrecoAnt').value);
+  const p=parseFloat(document.getElementById('npPreco').value);
+  const nome=document.getElementById('npNome').value.trim()||'Açaí Premium';
+  const editId=document.getElementById('npEditId').value;
+  if(!tam||isNaN(pA)||isNaN(p)||p<=0||pA<=0){toast('Preencha todos os campos!','err');return;}
+  if(editId){
+    const prod=produtos.find(x=>x.id===editId);
+    if(prod){prod.tamanho=tam;prod.nome=nome;prod.preco=p;prod.precoAnt=pA;}
+    toast('✅ Produto atualizado!','ok');
+  } else {
+    produtos.push({id:uid(),tamanho:tam,nome,preco:p,precoAnt:pA,esgotado:false});
+    toast('✅ Produto adicionado!','ok');
+  }
+  lsSet(PROD_KEY,produtos);fecharModal('modNovoProd');renderProdutos();
+}
+
+// ══════════════════════════════════════════════════
+// ADD / EDIT COMPLEMENTO
+// ══════════════════════════════════════════════════
+function abrirNovoComp(){
+  document.getElementById('modalCompTitle').textContent='Adicionar Complemento';
+  document.getElementById('ncSaveBtn').textContent='Adicionar';
+  document.getElementById('ncNome').value='';
+  document.getElementById('ncPreco').value='';
+  document.getElementById('ncEditId').value='';
+  abrirModal('modNovoComp');
+}
+function abrirEditComp(id){
+  const c=complementos.find(x=>x.id===id);if(!c)return;
+  document.getElementById('modalCompTitle').textContent='Editar Complemento';
+  document.getElementById('ncSaveBtn').textContent='Salvar alterações';
+  document.getElementById('ncNome').value=c.nome;
+  document.getElementById('ncPreco').value=c.preco;
+  document.getElementById('ncEditId').value=id;
+  abrirModal('modNovoComp');
+}
+function salvarComplemento(){
+  const nome=document.getElementById('ncNome').value.trim();
+  const p=parseFloat(document.getElementById('ncPreco').value);
+  const editId=document.getElementById('ncEditId').value;
+  if(!nome||isNaN(p)||p<=0){toast('Preencha todos os campos!','err');return;}
+  if(editId){
+    const c=complementos.find(x=>x.id===editId);
+    if(c){c.nome=nome;c.preco=p;}
+    toast('✅ Complemento atualizado!','ok');
+  } else {
+    complementos.push({id:uid(),nome,preco:p});
+    toast('✅ Complemento adicionado!','ok');
+  }
+  lsSet(COMP_KEY,complementos);fecharModal('modNovoComp');renderComplementos();
+}
+
+// ══════════════════════════════════════════════════
+// DELETE
+// ══════════════════════════════════════════════════
+let pendingDel=null;
+function confirmarDel(tipo,id,nome){
+  pendingDel={tipo,id};
+  document.getElementById('confirmDelMsg').textContent=`Remover "${nome}"? Esta ação não pode ser desfeita.`;
+  document.getElementById('confirmDelBtn').onclick=executarDel;
+  abrirModal('modConfirmDel');
+}
+async function executarDel(){
+  if(!pendingDel)return;
+  const{tipo,id}=pendingDel;
+  fecharModal('modConfirmDel');
+  if(tipo==='prod'){
+    produtos=produtos.filter(p=>p.id!==id);
+    lsSet(PROD_KEY,produtos);
+    if(prodSel&&prodSel.id===id){prodSel=null;}
+    await dbDel(id);delete imgCache[id];
+    renderProdutos();atualizarPedido();toast('✅ Produto removido.','ok');
+  } else {
+    complementos=complementos.filter(c=>c.id!==id);
+    lsSet(COMP_KEY,complementos);
+    compsSel.delete(id);
+    await dbDel(id);delete imgCache[id];
+    renderComplementos();atualizarPedido();toast('✅ Complemento removido.','ok');
+  }
+  pendingDel=null;
+}
+
+// ══════════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════════
+function abrirModalAdmin(){
+  document.getElementById('passInput').value='';
+  document.getElementById('passErro').style.display='none';
+  abrirModal('modAdmin');
+  setTimeout(()=>document.getElementById('passInput').focus(),150);
+}
+function verificarSenha(){
+  if(document.getElementById('passInput').value===ADMIN_SENHA){fecharModal('modAdmin');entrarAdmin();}
+  else document.getElementById('passErro').style.display='block';
+}
+function entrarAdmin(){
+  modoAdmin=true;
+  document.getElementById('adminBar').classList.add('open');
+  document.getElementById('heroEl').classList.add('pad-top');
+  document.getElementById('adminToggle').textContent='🔒 Sair';
+  document.getElementById('mainNav').style.top='42px';
+  document.body.classList.add('admin-mode');
+  renderLogo();renderProdutos();renderComplementos();
+  toast('Modo edição ativo — ✏ editar, ✕ remover, 📷 foto','ok');
+}
+function sairAdmin(){
+  modoAdmin=false;
+  document.getElementById('adminBar').classList.remove('open');
+  document.getElementById('heroEl').classList.remove('pad-top');
+  document.getElementById('adminToggle').textContent='⚙️ Admin';
+  document.getElementById('mainNav').style.top='0';
+  document.body.classList.remove('admin-mode');
+  renderLogo();renderProdutos();renderComplementos();
+  toast('✅ Alterações salvas!','ok');
+}
+async function resetAll(){
+  if(!confirm('Apagar TUDO? Fotos, produtos personalizados e configurações serão perdidos.'))return;
+  const ks=await dbKeys();
+  for(const k of ks){await dbDel(k);delete imgCache[k];}
+  [CFG_KEY,PROD_KEY,COMP_KEY].forEach(k=>localStorage.removeItem(k));
+  cfg={pixChave:'31997892312',horario:null};
+  produtos=prodPadrao();complementos=compPadrao();
+  prodSel=null;compsSel=new Set();
+  renderLogo();renderProdutos();renderComplementos();atualizarPedido();renderHorario();
+  toast('🗑 Tudo resetado.','ok');
+}
+function abrirModalPix(){
+  document.getElementById('pixInput').value=cfg.pixChave||'';
+  abrirModal('modPix');
+  setTimeout(()=>document.getElementById('pixInput').focus(),150);
+}
+function salvarPix(){
+  const v=document.getElementById('pixInput').value.trim();
+  if(!v){toast('Digite uma chave PIX','err');return;}
+  cfg.pixChave=v;lsSet(CFG_KEY,cfg);
+  fecharModal('modPix');toast('✅ Chave PIX salva!','ok');
+}
+
+// ══════════════════════════════════════════════════
+// MODAIS
+// ══════════════════════════════════════════════════
+function abrirModal(id){document.getElementById(id).classList.add('open');}
+function fecharModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.moverlay').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+
+// ══════════════════════════════════════════════════
+// NAV ATIVO
+// ══════════════════════════════════════════════════
+window.addEventListener('scroll',()=>{
+  let cur='';
+  ['produtos','complementos','pedido','info'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&window.scrollY>=el.offsetTop-110)cur=id;
+  });
+  document.querySelectorAll('.nav a').forEach(a=>{
+    a.classList.toggle('active',a.getAttribute('href')==='#'+cur);
+  });
+});
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+async function init(){
+  await abrirDB();
+  const ids=['logo',...produtos.map(p=>p.id),...complementos.map(c=>c.id)];
+  await Promise.all(ids.map(async id=>{const img=await dbGet(id);if(img)imgCache[id]=img;}));
+  renderLogo();renderProdutos();renderComplementos();atualizarPedido();renderHorario();
+}
+init();
+</script>
+</body>
+</html>
