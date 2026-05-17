@@ -144,6 +144,23 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .del-toggle{display:flex;gap:10px;margin:16px 0;}
 .del-btn{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:.2s;}
 .del-btn.active{border-color:var(--gold);color:var(--gold-l);background:var(--gold-dim);}
+
+/* ZONAS DE ENTREGA */
+.zona-select-wrap{margin:12px 0;display:none;}
+.zona-select-label{font-size:12px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:block;}
+.zona-select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 16px;outline:none;cursor:pointer;transition:.2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a7a9e' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;}
+.zona-select:focus{border-color:rgba(201,162,39,.4);}
+.zona-select option{background:#1c1428;color:var(--text);}
+.zona-fee-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold-dim);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;color:var(--gold-l);font-weight:600;margin-top:8px;}
+.zona-min-info{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;}
+
+/* ADMIN ZONAS */
+.zonas-admin-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:260px;overflow-y:auto;}
+.zona-admin-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;gap:10px;}
+.zona-admin-name{font-size:13px;font-weight:500;flex:1;}
+.zona-admin-price{font-size:13px;color:var(--gold);font-weight:600;white-space:nowrap;}
+.zona-admin-del{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;}
+.zona-add-row{display:grid;grid-template-columns:1fr auto;gap:8px;}
 .obs-area{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 16px;margin-top:12px;resize:none;outline:none;transition:.2s;}
 .obs-area:focus{border-color:rgba(201,162,39,.4);}
 .obs-area::placeholder{color:var(--muted);}
@@ -256,6 +273,7 @@ footer span{color:var(--gold);}
   <div class="admin-btns">
     <button class="abtn" onclick="abrirModalPix()">💳 Chave PIX</button>
     <button class="abtn" onclick="abrirModalHorario()">🕐 Horário</button>
+    <button class="abtn" onclick="abrirModalZonas()">🛵 Zonas</button>
     <button class="abtn save" onclick="sairAdmin()">✅ Salvar & Sair</button>
   </div>
 </div>
@@ -305,7 +323,17 @@ footer span{color:var(--gold);}
     <div id="orderLines"><div class="order-empty">Nenhum item selecionado ainda.<br>Escolha um tamanho acima! 🍇</div></div>
     <div class="del-toggle" id="delToggle" style="display:none">
       <button class="del-btn active" id="btnRet" onclick="setDel('retirada')">🏪 Retirar no local</button>
-      <button class="del-btn" id="btnEnt" onclick="setDel('entrega')">🛵 Delivery +R$6,99</button>
+      <button class="del-btn" id="btnEnt" onclick="setDel('entrega')">🛵 Delivery <span id="freteMin">a partir de R$6,99</span></button>
+    </div>
+    <div class="zona-select-wrap" id="zonaWrap">
+      <span class="zona-select-label">📍 Selecione sua localidade</span>
+      <select class="zona-select" id="zonaSelect" onchange="selecionarZona()">
+        <option value="">-- Escolha sua região --</option>
+      </select>
+      <div id="zonaFeeInfo" style="display:none">
+        <div class="zona-fee-badge">🛵 Taxa de entrega: <span id="zonaFeeVal">—</span></div>
+        <div class="zona-min-info">Valor pode variar conforme endereço</div>
+      </div>
     </div>
     <textarea class="obs-area" id="obsArea" rows="2" placeholder="Endereço de entrega, observações..." style="display:none"></textarea>
     <div class="payment-btns">
@@ -376,7 +404,7 @@ footer span{color:var(--gold);}
   <div class="info-grid">
     <div class="icard"><div class="iicon">📱</div><div><div class="ilabel">WhatsApp</div><div class="ivalue"><a href="https://wa.me/5531997892312">(31) 99789-2312</a><br><a href="https://wa.me/5531996968394">(31) 99696-8394</a></div></div></div>
     <div class="icard"><div class="iicon">📍</div><div><div class="ilabel">Retirada no local</div><div class="ivalue">Rua Osmar da Silva Araújo, Nº 296<br>Bairro Maria José — Vespasiano/MG</div></div></div>
-    <div class="icard"><div class="iicon">🛵</div><div><div class="ilabel">Taxa de entrega</div><div class="ivalue">R$ 6,99 — Região de Vespasiano/MG</div></div></div>
+    <div class="icard"><div class="iicon">🛵</div><div style="flex:1"><div class="ilabel">Taxa de entrega</div><div class="ivalue" id="entregaInfoCard">A partir de R$ 6,99 — conforme localidade</div></div><button class="icard-edit-btn" onclick="abrirModalZonas()">✏️</button></div>
     <div class="icard"><div class="iicon">💳</div><div><div class="ilabel">Formas de pagamento</div><div class="ivalue">PIX • Dinheiro • Cartão</div></div></div>
     <div class="icard" id="icardHorario">
       <div class="iicon">🕐</div>
@@ -476,7 +504,25 @@ footer span{color:var(--gold);}
   </div>
 </div>
 
-<!-- FIREBASE + CLOUDINARY -->
+<!-- MODAL ZONAS DE ENTREGA -->
+<div class="moverlay" id="modZonas">
+  <div class="mbox">
+    <h3>Zonas de Entrega</h3>
+    <p>Gerencie as localidades e taxas de entrega</p>
+    <div class="zonas-admin-list" id="zonasAdminList"></div>
+    <div style="border-top:1px solid var(--border2);padding-top:16px;margin-top:4px;">
+      <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Adicionar nova zona</div>
+      <div class="mfield"><label>Nome da localidade</label><input class="minput" id="zonaNovoNome" placeholder="Ex: Contagem, Santa Luzia..."></div>
+      <div class="zona-add-row">
+        <div class="mfield" style="margin-bottom:0"><label>Taxa (R$)</label><input class="minput" id="zonaNovoPreco" type="number" step="0.50" placeholder="Ex: 8.00"></div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:0">
+          <button class="mbtn primary" onclick="adicionarZona()" style="height:47px;padding:0 20px;">Adicionar</button>
+        </div>
+      </div>
+    </div>
+    <div class="mactions"><button class="mbtn save" onclick="fecharModal('modZonas')">✅ Concluir</button></div>
+  </div>
+</div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -506,11 +552,17 @@ const db  = getFirestore(app);
 // ── ESTADO ────────────────────────────────────────
 let modoAdmin   = false;
 let tipoEntrega = 'retirada';
+let zonaSelId   = null;
 let prodSel     = null;
 let compsSel    = new Set();
 let produtos    = [];
 let complementos= [];
-let cfg         = { pixChave: '31997892312', horario: null };
+let cfg         = { pixChave: '31997892312', horario: null, zonas: [
+  { id:'z1', nome:'Vespasiano', taxa:6.99 },
+  { id:'z2', nome:'Santa Luzia', taxa:8.99 },
+  { id:'z3', nome:'Contagem', taxa:10.99 },
+  { id:'z4', nome:'Belo Horizonte', taxa:12.99 },
+]};
 
 // ── FORMAT ────────────────────────────────────────
 const fmt  = v => 'R$ ' + v.toFixed(2).replace('.', ',');
@@ -741,14 +793,50 @@ window.setDel = function(tipo) {
   tipoEntrega = tipo;
   document.getElementById('btnRet').classList.toggle('active', tipo==='retirada');
   document.getElementById('btnEnt').classList.toggle('active', tipo==='entrega');
+  const zonaWrap = document.getElementById('zonaWrap');
+  zonaWrap.style.display = tipo==='entrega' ? 'block' : 'none';
+  if(tipo==='retirada'){ zonaSelId=null; document.getElementById('zonaSelect').value=''; document.getElementById('zonaFeeInfo').style.display='none'; }
   atualizarPedido();
 };
+
+window.selecionarZona = function() {
+  const sel = document.getElementById('zonaSelect');
+  zonaSelId = sel.value || null;
+  const zona = cfg.zonas.find(z=>z.id===zonaSelId);
+  const feeInfo = document.getElementById('zonaFeeInfo');
+  const feeVal  = document.getElementById('zonaFeeVal');
+  if(zona){ feeVal.textContent = fmt(zona.taxa); feeInfo.style.display='block'; }
+  else { feeInfo.style.display='none'; }
+  atualizarPedido();
+};
+
+function getTaxaEntrega() {
+  if(tipoEntrega!=='entrega') return 0;
+  const zona = cfg.zonas.find(z=>z.id===zonaSelId);
+  return zona ? zona.taxa : (cfg.zonas.length>0 ? cfg.zonas[0].taxa : 6.99);
+}
+
+function renderZonaSelect() {
+  const sel = document.getElementById('zonaSelect');
+  sel.innerHTML = '<option value="">-- Escolha sua região --</option>';
+  (cfg.zonas||[]).forEach(z=>{
+    const opt = document.createElement('option');
+    opt.value = z.id;
+    opt.textContent = `${z.nome} — ${fmt(z.taxa)}`;
+    sel.appendChild(opt);
+  });
+  // Update min frete label
+  const taxas = (cfg.zonas||[]).map(z=>z.taxa);
+  const minTaxa = taxas.length ? Math.min(...taxas) : 6.99;
+  const el = document.getElementById('freteMin');
+  if(el) el.textContent = `a partir de ${fmt(minTaxa)}`;
+}
 
 function calcTotal() {
   if(!prodSel) return 0;
   let t = prodSel.preco;
   complementos.forEach(c => { if(compsSel.has(c.id)) t += c.preco; });
-  if(tipoEntrega==='entrega') t += TAXA_ENTREGA;
+  t += getTaxaEntrega();
   return t;
 }
 function contarItens() { return !prodSel ? 0 : 1 + compsSel.size; }
@@ -778,7 +866,13 @@ function atualizarPedido() {
     total += c.preco;
     html += `<div class="order-line"><div class="order-line-info"><div class="order-line-name">+ ${c.nome}</div><div class="order-line-price">${fmt(c.preco)}</div></div><button class="order-line-remove" onclick="removerCompPedido('${c.id}')">✕ Remover</button></div>`;
   });
-  if(tipoEntrega==='entrega') { total+=TAXA_ENTREGA; html+=`<div class="order-line"><div class="order-line-info"><div class="order-line-name">🛵 Taxa de entrega</div><div class="order-line-price">${fmt(TAXA_ENTREGA)}</div></div></div>`; }
+  if(tipoEntrega==='entrega') {
+    const taxa = getTaxaEntrega();
+    const zona = cfg.zonas.find(z=>z.id===zonaSelId);
+    const nomeZona = zona ? zona.nome : 'Entrega';
+    total += taxa;
+    html+=`<div class="order-line"><div class="order-line-info"><div class="order-line-name">🛵 Entrega — ${nomeZona}</div><div class="order-line-price">${fmt(taxa)}</div></div></div>`;
+  }
   html += `<div class="order-total"><span>Total</span><span>${fmt(total)}</span></div>`;
   lines.innerHTML = html;
   btnP.disabled = btnC.disabled = false;
@@ -793,7 +887,11 @@ window.abrirConfirmacaoPedido = function(tipo) {
   const total = calcTotal();
   let html = `<div class="confirm-item"><span>🍇 ${prodSel.nome} ${prodSel.tamanho}</span><span>${fmt(prodSel.preco)}</span></div>`;
   scs.forEach(c => { html+=`<div class="confirm-item"><span>+ ${c.nome}</span><span>${fmt(c.preco)}</span></div>`; });
-  if(tipoEntrega==='entrega') html+=`<div class="confirm-item"><span>🛵 Entrega</span><span>${fmt(TAXA_ENTREGA)}</span></div>`;
+  if(tipoEntrega==='entrega') {
+    const taxa = getTaxaEntrega();
+    const zona = cfg.zonas.find(z=>z.id===zonaSelId);
+    html+=`<div class="confirm-item"><span>🛵 Entrega${zona?' — '+zona.nome:''}</span><span>${fmt(taxa)}</span></div>`;
+  }
   document.getElementById('confirmOrderItems').innerHTML = html;
   document.getElementById('confirmTotal').innerHTML = `<span>Total a pagar</span><span>${fmt(total)}</span>`;
   document.getElementById('confirmTipo').textContent = tipoEntrega==='entrega' ? '🛵 Pedido com entrega' : '🏪 Retirada no local';
@@ -852,14 +950,73 @@ window.enviarWhats = function() {
   const total = calcTotal();
   let msg = `🍇 *Pedido Açaví*\n\n*${prodSel.nome} ${prodSel.tamanho}* — ${fmt(prodSel.preco)}\n`;
   if(scs.length){ msg+=`\n*Complementos:*\n`; scs.forEach(c=>{ msg+=`• ${c.nome} — ${fmt(c.preco)}\n`; }); }
-  if(tipoEntrega==='entrega') msg+=`\n🛵 Taxa de entrega: ${fmt(TAXA_ENTREGA)}\n`;
+  if(tipoEntrega==='entrega') {
+    const taxa = getTaxaEntrega();
+    const zona = cfg.zonas.find(z=>z.id===zonaSelId);
+    msg+=`\n🛵 Entrega${zona?' — '+zona.nome:''}: ${fmt(taxa)}\n`;
+  }
   msg+=`\n💳 *Total pago via PIX: ${fmt(total)}*`;
   msg+=`\n📋 *Tipo:* ${tipoEntrega==='entrega'?'Delivery':'Retirada no local'}`;
   if(obs) msg+=`\n\n📝 *Obs:* ${obs}`;
   window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(msg)}`, '_blank');
 };
 
-// ── HORÁRIO ───────────────────────────────────────
+// ── ZONAS DE ENTREGA ─────────────────────────────
+function renderZonasAdmin() {
+  const list = document.getElementById('zonasAdminList');
+  if(!list) return;
+  list.innerHTML = '';
+  (cfg.zonas||[]).forEach(z=>{
+    const d = document.createElement('div');
+    d.className = 'zona-admin-item';
+    d.innerHTML = `<span class="zona-admin-name">${z.nome}</span><span class="zona-admin-price">${fmt(z.taxa)}</span><button class="zona-admin-del" onclick="removerZona('${z.id}')">✕</button>`;
+    list.appendChild(d);
+  });
+  if(!cfg.zonas||!cfg.zonas.length){
+    list.innerHTML='<div style="font-size:13px;color:var(--muted);text-align:center;padding:10px">Nenhuma zona cadastrada</div>';
+  }
+}
+
+window.abrirModalZonas = function() {
+  renderZonasAdmin();
+  abrirModal('modZonas');
+};
+
+window.adicionarZona = async function() {
+  const nome = document.getElementById('zonaNovoNome').value.trim();
+  const taxa = parseFloat(document.getElementById('zonaNovoPreco').value);
+  if(!nome || isNaN(taxa) || taxa<0){ toast('Preencha nome e taxa!','err'); return; }
+  if(!cfg.zonas) cfg.zonas=[];
+  const nova = { id:'z'+Date.now(), nome, taxa };
+  cfg.zonas.push(nova);
+  await fbSet('config','site',{ zonas: cfg.zonas });
+  document.getElementById('zonaNovoNome').value='';
+  document.getElementById('zonaNovoPreco').value='';
+  renderZonasAdmin();
+  renderZonaSelect();
+  renderEntregaInfo();
+  toast('✅ Zona adicionada!','ok');
+};
+
+window.removerZona = async function(id) {
+  cfg.zonas = (cfg.zonas||[]).filter(z=>z.id!==id);
+  await fbSet('config','site',{ zonas: cfg.zonas });
+  renderZonasAdmin();
+  renderZonaSelect();
+  renderEntregaInfo();
+  if(zonaSelId===id){ zonaSelId=null; atualizarPedido(); }
+  toast('✅ Zona removida.','ok');
+};
+
+function renderEntregaInfo() {
+  const el = document.getElementById('entregaInfoCard');
+  if(!el) return;
+  const taxas = (cfg.zonas||[]).map(z=>z.taxa);
+  if(!taxas.length){ el.textContent='Sem entrega cadastrada'; return; }
+  const min = Math.min(...taxas);
+  const max = Math.max(...taxas);
+  el.textContent = min===max ? `R$ ${min.toFixed(2).replace('.',',')} — conforme localidade` : `De R$ ${min.toFixed(2).replace('.',',')} a R$ ${max.toFixed(2).replace('.',',')} — conforme localidade`;
+}
 function renderHorario() {
   const h = cfg.horario;
   const disp   = document.getElementById('horarioDisplay');
@@ -1106,6 +1263,7 @@ async function init() {
       cfg.pixChave = cfgSnap.pixChave || '31997892312';
       cfg.horario  = cfgSnap.horario  || null;
       cfg.logoUrl  = cfgSnap.logoUrl  || null;
+      cfg.zonas    = cfgSnap.zonas    || cfg.zonas;
     }
 
     // Carregar produtos
@@ -1139,6 +1297,8 @@ async function init() {
   renderComplementos();
   atualizarPedido();
   renderHorario();
+  renderZonaSelect();
+  renderEntregaInfo();
 
   // Esconder loading
   setTimeout(() => {
