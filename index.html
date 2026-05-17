@@ -188,9 +188,16 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .obs-area{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 16px;margin-top:12px;resize:none;outline:none;transition:.2s;}
 .obs-area:focus{border-color:rgba(201,162,39,.4);}
 .obs-area::placeholder{color:var(--muted);}
-.btn-pix{width:100%;margin-top:16px;background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#000;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--tr);}
+.payment-btns{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.btn-pix{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#000;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--tr);}
 .btn-pix:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(201,162,39,.3);}
 .btn-pix:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-cartao{width:100%;background:linear-gradient(135deg,#1a56db,#3b82f6);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:var(--tr);}
+.btn-cartao:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(59,130,246,.35);}
+.btn-cartao:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
+.payment-divider{text-align:center;font-size:12px;color:var(--muted);position:relative;}
+.payment-divider::before,.payment-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border2);}
+.payment-divider::before{left:0;}.payment-divider::after{right:0;}
 
 /* ── PIX ── */
 .pix-section{background:linear-gradient(135deg,rgba(201,162,39,.07),rgba(107,33,168,.07));border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:20px;display:none;}
@@ -340,7 +347,11 @@ footer span{color:var(--gold);}
       <button class="del-btn" id="btnEnt" onclick="setDel('entrega')">🛵 Delivery +R$6,99</button>
     </div>
     <textarea class="obs-area" id="obsArea" rows="2" placeholder="Endereço de entrega, observações..." style="display:none"></textarea>
-    <button class="btn-pix" id="btnPagar" onclick="abrirConfirmacaoPedido()" disabled>💳 Pagar via PIX</button>
+    <div class="payment-btns">
+      <button class="btn-pix" id="btnPagar" onclick="abrirConfirmacaoPedido('pix')" disabled>💳 Pagar via PIX</button>
+      <div class="payment-divider">ou</div>
+      <button class="btn-cartao" id="btnCartao" onclick="abrirConfirmacaoPedido('cartao')" disabled>💳 Pagar com Cartão</button>
+    </div>
   </div>
   <div class="pix-section" id="pixSection">
     <div class="pix-head">Pagamento via <span style="color:var(--gold)">PIX</span></div>
@@ -508,7 +519,8 @@ footer span{color:var(--gold);}
     <div class="confirm-tipo" id="confirmTipo"></div>
     <div class="mactions">
       <button class="mbtn" onclick="fecharModal('modConfirmPedido')">← Voltar e editar</button>
-      <button class="mbtn green" onclick="confirmarEPagar()">✅ Confirmar e Pagar</button>
+      <button class="mbtn primary" id="btnConfirmPix" onclick="confirmarEPagar('pix')">💳 Pagar via PIX</button>
+      <button class="mbtn" id="btnConfirmCartao" style="background:linear-gradient(135deg,#1a56db,#3b82f6);border-color:#3b82f6;color:#fff;" onclick="confirmarEPagar('cartao')">💳 Pagar com Cartão</button>
     </div>
   </div>
 </div>
@@ -802,7 +814,9 @@ function atualizarPedido(){
 
   if(!prodSel){
     lines.innerHTML='<div class="order-empty">Nenhum item selecionado ainda.<br>Escolha um tamanho acima! 🍇</div>';
-    btnP.disabled=true;delt.style.display='none';obs.style.display='none';
+    btnP.disabled=true;
+    document.getElementById('btnCartao').disabled=true;
+    delt.style.display='none';obs.style.display='none';
     flt.classList.remove('show');pixS.classList.remove('open');return;
   }
 
@@ -835,7 +849,9 @@ function atualizarPedido(){
   }
   html+=`<div class="order-total"><span>Total</span><span>${fmt(total)}</span></div>`;
   lines.innerHTML=html;
-  btnP.disabled=false;delt.style.display='flex';obs.style.display='block';
+  btnP.disabled=false;
+  document.getElementById('btnCartao').disabled=false;
+  delt.style.display='flex';obs.style.display='block';
   flt.classList.add('show');
   fval.textContent=fmt(total);
   fbadge.textContent=contarItens();
@@ -844,24 +860,49 @@ function atualizarPedido(){
 // ══════════════════════════════════════════════════
 // CONFIRMAÇÃO DO PEDIDO (modal antes do PIX)
 // ══════════════════════════════════════════════════
-function abrirConfirmacaoPedido(){
+function abrirConfirmacaoPedido(tipo){
   if(!prodSel)return;
   const scs=complementos.filter(c=>compsSel.has(c.id));
   const total=calcTotal();
-
   let html=`<div class="confirm-item"><span>🍇 ${prodSel.nome} ${prodSel.tamanho}</span><span>${fmt(prodSel.preco)}</span></div>`;
   scs.forEach(c=>{html+=`<div class="confirm-item"><span>+ ${c.nome}</span><span>${fmt(c.preco)}</span></div>`;});
   if(tipoEntrega==='entrega'){html+=`<div class="confirm-item"><span>🛵 Entrega</span><span>${fmt(TAXA_ENTREGA)}</span></div>`;}
-
   document.getElementById('confirmOrderItems').innerHTML=html;
   document.getElementById('confirmTotal').innerHTML=`<span>Total a pagar</span><span>${fmt(total)}</span>`;
   document.getElementById('confirmTipo').textContent=tipoEntrega==='entrega'?'🛵 Pedido com entrega':'🏪 Retirada no local';
+  // Mostrar só o botão do tipo escolhido
+  document.getElementById('btnConfirmPix').style.display=tipo==='pix'?'':'none';
+  document.getElementById('btnConfirmCartao').style.display=tipo==='cartao'?'':'none';
   abrirModal('modConfirmPedido');
 }
 
-function confirmarEPagar(){
+async function confirmarEPagar(tipo){
   fecharModal('modConfirmPedido');
   const total=calcTotal();
+  if(tipo==='cartao'){
+    // Chama a função do Vercel para criar preferência no Mercado Pago
+    const scs=complementos.filter(c=>compsSel.has(c.id));
+    let descricao=`Açaví - ${prodSel.nome} ${prodSel.tamanho}`;
+    if(scs.length) descricao+=` + ${scs.map(c=>c.nome).join(', ')}`;
+    try{
+      toast('Abrindo pagamento com cartão...','ok');
+      const resp=await fetch('/api/checkout',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({total,descricao})
+      });
+      const data=await resp.json();
+      if(data.url){
+        window.open(data.url,'_blank');
+      } else {
+        toast('❌ Erro ao abrir pagamento. Tente o PIX.','err');
+      }
+    } catch{
+      toast('❌ Erro de conexão. Tente o PIX.','err');
+    }
+    return;
+  }
+  // PIX
   document.getElementById('pixKeyShow').textContent=cfg.pixChave||'(não configurada)';
   document.getElementById('pixValor').textContent=fmt(total);
   const s=document.getElementById('pixSection');
