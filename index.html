@@ -69,58 +69,64 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .sec-header .sec-sub{margin-bottom:0;}
 
 /* PRODUCTS */
-.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;}
-.pcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:var(--tr);cursor:pointer;position:relative;}
-.pcard:not(.esgotado-card):hover{transform:translateY(-5px);border-color:rgba(201,162,39,.45);box-shadow:0 16px 48px rgba(107,33,168,.25);}
-.pcard.selected{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),0 16px 48px rgba(201,162,39,.2);}
+.products-grid{display:flex;flex-direction:column;gap:12px;}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:var(--tr);cursor:pointer;position:relative;display:flex;align-items:stretch;min-height:110px;}
+.pcard:not(.esgotado-card):hover{transform:translateY(-2px);border-color:rgba(201,162,39,.45);box-shadow:0 4px 24px rgba(107,33,168,.2);}
+.pcard.selected{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);}
 .sel-badge{position:absolute;top:10px;right:10px;background:var(--gold);color:#000;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;opacity:0;transition:.2s;z-index:5;}
 .pcard.selected .sel-badge{opacity:1;}
 .esgotado-card{opacity:.55;cursor:not-allowed;}
 .esgotado-card:hover{transform:none!important;box-shadow:none!important;border-color:var(--border)!important;}
 .esgotado-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:6;pointer-events:none;}
 .esgotado-tag{background:var(--red);color:#fff;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 14px;border-radius:6px;}
-.admin-esgotado-toggle{position:absolute;bottom:8px;right:8px;font-size:10px;padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:rgba(0,0,0,.5);color:var(--muted);cursor:pointer;display:none;z-index:10;font-family:'DM Sans',sans-serif;transition:.2s;}
+.admin-esgotado-toggle{position:absolute;bottom:8px;left:8px;font-size:10px;padding:4px 8px;border-radius:6px;border:1px solid var(--border2);background:rgba(0,0,0,.5);color:var(--muted);cursor:pointer;display:none;z-index:10;font-family:"DM Sans",sans-serif;transition:.2s;}
 .admin-mode .admin-esgotado-toggle{display:block;}
-.pimg-wrap{width:100%;height:150px;position:relative;overflow:hidden;}
+.pimg-wrap{width:120px;min-width:120px;height:110px;position:relative;overflow:hidden;flex-shrink:0;order:2;}
 .pimg-wrap img{width:100%;height:100%;object-fit:cover;transition:.4s;}
 .pcard:not(.esgotado-card):hover .pimg-wrap img{transform:scale(1.06);}
-.pimg-ph{width:100%;height:100%;background:linear-gradient(135deg,#2a1245,#4c1d95 60%,#1e0f30);display:flex;align-items:center;justify-content:center;font-size:52px;}
+.pimg-ph{width:100%;height:100%;background:linear-gradient(135deg,#2a1245,#4c1d95 60%,#1e0f30);display:flex;align-items:center;justify-content:center;font-size:40px;}
 .pimg-edit-layer{position:absolute;inset:0;background:rgba(107,33,168,.78);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;opacity:0;transition:.2s;font-size:12px;color:#fff;pointer-events:none;cursor:pointer;}
-.pimg-edit-layer span{font-size:28px;}
+.pimg-edit-layer span{font-size:22px;}
 .pcard:hover .pimg-edit-layer.on{opacity:1;pointer-events:all;}
-.pbody{padding:14px 16px;}
-.psize{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
-.psub{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.pcard-info{flex:1;padding:14px 16px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;order:1;}
+.psize{font-family:"Playfair Display",serif;font-size:20px;font-weight:700;}
+.psub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
 .price-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .price-old{font-size:12px;color:var(--muted);text-decoration:line-through;}
-.price-new{font-size:20px;font-weight:700;color:var(--gold-l);}
+.price-new{font-size:18px;font-weight:700;color:var(--gold-l);}
 .disc-badge{background:linear-gradient(135deg,var(--green),#16a34a);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .card-admin-btns{position:absolute;top:8px;left:8px;display:none;gap:4px;z-index:10;}
 .admin-mode .card-admin-btns{display:flex;}
 .cadmin-btn{width:28px;height:28px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:.2s;}
 .cadmin-btn.del{background:rgba(239,68,68,.85);color:#fff;}
 .cadmin-btn.edit{background:rgba(201,162,39,.85);color:#000;}
+.pdesc{font-size:12px;color:var(--muted);line-height:1.5;margin:3px 0 5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.add-card{background:rgba(201,162,39,.05);border:2px dashed rgba(201,162,39,.25);border-radius:var(--r);display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;min-height:70px;cursor:pointer;transition:var(--tr);color:var(--muted);}
+.add-card:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,162,39,.08);}
+.add-card-icon{font-size:24px;}
+.add-card-label{font-size:13px;letter-spacing:1px;text-transform:uppercase;}
 
 /* COMPLEMENTS */
 #complementos{border-top:1px solid var(--border);}
-.comps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:12px;}
-.ccard{background:var(--card);border:1px solid var(--border2);border-radius:12px;overflow:hidden;cursor:pointer;transition:var(--tr);position:relative;}
+.comps-grid{display:flex;flex-direction:column;gap:10px;}
+.ccard{background:var(--card);border:1px solid var(--border2);border-radius:12px;overflow:hidden;cursor:pointer;transition:var(--tr);position:relative;display:flex;align-items:stretch;min-height:72px;}
 .ccard:hover{border-color:rgba(201,162,39,.3);}
-.ccard.selected{border-color:var(--gold);background:rgba(201,162,39,.07);}
-.cstrip{position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transition:.25s;transform-origin:left;}
-.ccard.selected .cstrip{transform:scaleX(1);}
-.cimg-wrap{width:100%;height:90px;position:relative;overflow:hidden;}
+.ccard.selected{border-color:var(--gold);background:rgba(201,162,39,.06);}
+.cstrip{position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--gold);transform:scaleY(0);transition:.25s;transform-origin:top;}
+.ccard.selected .cstrip{transform:scaleY(1);}
+.cimg-wrap{width:80px;min-width:80px;height:72px;position:relative;overflow:hidden;flex-shrink:0;order:2;}
 .cimg-wrap img{width:100%;height:100%;object-fit:cover;}
-.cimg-ph{width:100%;height:100%;background:linear-gradient(135deg,#1e1126,#2d1540);display:flex;align-items:center;justify-content:center;font-size:32px;}
-.cimg-edit-layer{position:absolute;inset:0;background:rgba(107,33,168,.78);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;font-size:20px;pointer-events:none;cursor:pointer;}
+.cimg-ph{width:100%;height:100%;background:linear-gradient(135deg,#1e1126,#2d1540);display:flex;align-items:center;justify-content:center;font-size:26px;}
+.cimg-edit-layer{position:absolute;inset:0;background:rgba(107,33,168,.78);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;font-size:16px;pointer-events:none;cursor:pointer;}
 .ccard:hover .cimg-edit-layer.on{opacity:1;pointer-events:all;}
-.cbody{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:6px;}
-.cname{font-size:12px;font-weight:500;}
-.cprice{font-size:12px;color:var(--gold);font-weight:600;white-space:nowrap;}
-.ccheck{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:.2s;}
+.cbody{flex:1;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;order:1;}
+.cname{font-size:14px;font-weight:500;}
+.cprice{font-size:14px;color:var(--gold);font-weight:600;white-space:nowrap;}
+.ccheck{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:.2s;}
 .ccard.selected .ccheck{background:var(--gold);border-color:var(--gold);color:#000;font-weight:bold;}
 .ccard-admin-btns{position:absolute;top:6px;left:6px;display:none;gap:4px;z-index:10;}
 .admin-mode .ccard-admin-btns{display:flex;}
+.add-comp-card{min-height:60px;}
 
 /* ADD CARDS */
 .add-card{background:rgba(201,162,39,.05);border:2px dashed rgba(201,162,39,.25);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:200px;cursor:pointer;transition:var(--tr);color:var(--muted);}
@@ -210,9 +216,22 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .icard-edit-btn{position:absolute;top:10px;right:10px;background:rgba(201,162,39,.15);border:1px solid rgba(201,162,39,.3);color:var(--gold-l);border-radius:6px;padding:3px 8px;font-size:10px;cursor:pointer;display:none;font-family:'DM Sans',sans-serif;}
 .admin-mode .icard-edit-btn{display:block;}
 
-footer{position:relative;z-index:1;text-align:center;padding:28px 20px;border-top:1px solid var(--border);color:var(--muted);font-size:12px;line-height:1.8;}
-footer span{color:var(--gold);}
-.footer-horario{font-size:13px;color:var(--text);margin-bottom:4px;}
+/* FRETE GRÁTIS BANNER */
+.frete-gratis-banner{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:12px 20px;margin-top:20px;}
+.frete-gratis-text{font-size:14px;font-weight:700;color:#22c55e;letter-spacing:.5px;text-align:center;}
+
+/* FOOTER PROFISSIONAL */
+.footer-pro{position:relative;z-index:1;border-top:1px solid var(--border);padding:40px 20px 24px;}
+.footer-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:32px;}
+.footer-col-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--gold-l);margin-bottom:12px;}
+.footer-col-item{font-size:13px;color:var(--muted);line-height:2.2;display:block;}
+.footer-col-item a{color:var(--muted);text-decoration:none;transition:.2s;}
+.footer-col-item a:hover{color:var(--gold-l);}
+.footer-col-item strong{color:var(--text);}
+.footer-bottom{max-width:960px;margin:28px auto 0;padding-top:20px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-copy{font-size:12px;color:var(--muted);}
+.footer-copy span{color:var(--gold);}
+.footer-horario-tag{font-size:12px;color:var(--green);font-weight:500;}
 
 /* FLOAT */
 .float-btn{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#000;border:none;border-radius:50px;padding:13px 20px;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;display:none;align-items:center;gap:8px;z-index:200;box-shadow:0 8px 24px rgba(201,162,39,.4);transition:var(--tr);}
@@ -253,7 +272,7 @@ footer span{color:var(--gold);}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 .hero{animation:fadeUp .7s ease both;}
-@media(max-width:500px){.products-grid{grid-template-columns:repeat(2,1fr);}.comps-grid{grid-template-columns:repeat(2,1fr);}.info-grid{grid-template-columns:1fr;}.admin-btns{gap:4px;}.abtn{padding:5px 8px;font-size:10px;}.mrow{grid-template-columns:1fr;}}
+@media(max-width:500px){.comps-grid{grid-template-columns:repeat(2,1fr);}.info-grid{grid-template-columns:1fr;}.admin-btns{gap:4px;}.abtn{padding:5px 8px;font-size:10px;}.mrow{grid-template-columns:1fr;}.pimg-wrap{width:100px;min-width:100px;}.psize{font-size:18px;}}
 </style>
 </head>
 <body>
@@ -397,13 +416,20 @@ footer span{color:var(--gold);}
   </div>
 </section>
 
-<!-- INFO -->
+<!-- FRETE GRÁTIS BANNER -->
+<div style="position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 20px;">
+  <div class="frete-gratis-banner">
+    <span style="font-size:20px">🛵</span>
+    <span class="frete-gratis-text">FRETE GRÁTIS PARA VESPASIANO E REGIÃO!</span>
+    <span style="font-size:20px">🎉</span>
+  </div>
+</div>
+
+<!-- INFO + FOOTER PROFISSIONAL -->
 <section id="info">
   <div class="sec-title">Entrega & <span>Contato</span></div>
   <div class="sec-sub">Como receber ou retirar seu pedido</div>
   <div class="info-grid">
-    <div class="icard"><div class="iicon">📱</div><div><div class="ilabel">WhatsApp</div><div class="ivalue"><a href="https://wa.me/5531997892312">(31) 99789-2312</a><br><a href="https://wa.me/5531996968394">(31) 99696-8394</a></div></div></div>
-    <div class="icard"><div class="iicon">📍</div><div><div class="ilabel">Retirada no local</div><div class="ivalue">Rua Osmar da Silva Araújo, Nº 296<br>Bairro Maria José — Vespasiano/MG</div></div></div>
     <div class="icard"><div class="iicon">🛵</div><div style="flex:1"><div class="ilabel">Taxa de entrega</div><div class="ivalue" id="entregaInfoCard">A partir de R$ 6,99 — conforme localidade</div></div><button class="icard-edit-btn" onclick="abrirModalZonas()">✏️</button></div>
     <div class="icard"><div class="iicon">💳</div><div><div class="ilabel">Formas de pagamento</div><div class="ivalue">PIX • Dinheiro • Cartão</div></div></div>
     <div class="icard" id="icardHorario">
@@ -414,9 +440,38 @@ footer span{color:var(--gold);}
   </div>
 </section>
 
-<footer>
-  <div class="footer-horario" id="footerHorario"></div>
-  Feito com 💜 para a <span>Açaví</span> — Vespasiano/MG
+<footer class="footer-pro">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-col-title">Açaví</div>
+      <span class="footer-col-item" style="color:var(--muted);font-style:italic;">Puro, intenso, inesquecível!</span>
+      <span class="footer-col-item" id="footerHorario"></span>
+      <span class="footer-col-item">Vespasiano — MG</span>
+    </div>
+    <div>
+      <div class="footer-col-title">Fale conosco</div>
+      <span class="footer-col-item"><a href="https://wa.me/5531997892312">(31) 99789-2312</a></span>
+      <span class="footer-col-item"><a href="https://wa.me/5531996968394">(31) 99696-8394</a></span>
+      <span class="footer-col-item"><a href="https://acaavi.vercel.app">acaavi.vercel.app</a></span>
+    </div>
+    <div>
+      <div class="footer-col-title">Retirada</div>
+      <span class="footer-col-item"><strong>Rua Osmar da Silva Araújo</strong></span>
+      <span class="footer-col-item">Nº 296 — Bairro Maria José</span>
+      <span class="footer-col-item">Vespasiano / MG</span>
+    </div>
+    <div>
+      <div class="footer-col-title">Pagamentos</div>
+      <span class="footer-col-item">💳 PIX</span>
+      <span class="footer-col-item">💵 Dinheiro</span>
+      <span class="footer-col-item">🏧 Cartão</span>
+      <span class="footer-col-item" style="color:var(--green);">🛵 Delivery disponível</span>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 <span>Açaví</span> — Todos os direitos reservados</span>
+    <span class="footer-horario-tag" id="footerHorarioTag"></span>
+  </div>
 </footer>
 
 <button class="float-btn" id="floatBtn" onclick="document.getElementById('pedido').scrollIntoView({behavior:'smooth'})">
@@ -466,6 +521,7 @@ footer span{color:var(--gold);}
       <div class="mfield"><label>Preço com desconto (R$)</label><input class="minput" id="npPreco" type="number" step="0.01" placeholder="Ex: 16.00"></div>
     </div>
     <div class="mfield"><label>Subtítulo</label><input class="minput" id="npNome" placeholder="Açaí Premium" value="Açaí Premium"></div>
+    <div class="mfield"><label>Descrição chamativa</label><input class="minput" id="npDesc" placeholder="Ex: Cremoso, gelado e irresistível 🤤"></div>
     <input type="hidden" id="npEditId">
     <div class="mactions"><button class="mbtn" onclick="fecharModal('modNovoProd')">Cancelar</button><button class="mbtn primary" id="npSaveBtn" onclick="salvarProduto()">Salvar</button></div>
   </div>
@@ -513,11 +569,18 @@ footer span{color:var(--gold);}
     <div style="border-top:1px solid var(--border2);padding-top:16px;margin-top:4px;">
       <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">Adicionar nova zona</div>
       <div class="mfield"><label>Nome da localidade</label><input class="minput" id="zonaNovoNome" placeholder="Ex: Contagem, Santa Luzia..."></div>
-      <div class="zona-add-row">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <input type="checkbox" id="zonaGratis" style="width:18px;height:18px;cursor:pointer;accent-color:var(--green)">
+        <label for="zonaGratis" style="font-size:13px;color:var(--green);cursor:pointer;font-weight:600;">🎉 Frete Grátis para esta região</label>
+      </div>
+      <div class="zona-add-row" id="zonaPrecoRow">
         <div class="mfield" style="margin-bottom:0"><label>Taxa (R$)</label><input class="minput" id="zonaNovoPreco" type="number" step="0.50" placeholder="Ex: 8.00"></div>
-        <div style="display:flex;align-items:flex-end;padding-bottom:0">
+        <div style="display:flex;align-items:flex-end;">
           <button class="mbtn primary" onclick="adicionarZona()" style="height:47px;padding:0 20px;">Adicionar</button>
         </div>
+      </div>
+      <div style="display:none;margin-top:8px;" id="zonaGratisRow">
+        <button class="mbtn primary" onclick="adicionarZona()" style="width:100%;">Adicionar zona grátis</button>
       </div>
     </div>
     <div class="mactions"><button class="mbtn save" onclick="fecharModal('modZonas')">✅ Concluir</button></div>
@@ -664,19 +727,20 @@ function renderProdutos() {
         <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('prod','${p.id}','${p.tamanho}')">✕</button>
         <button class="cadmin-btn edit" onclick="event.stopPropagation();abrirEditProd('${p.id}')">✏</button>
       </div>
-      <div class="pimg-wrap" id="pimgwrap-${p.id}">
-        ${p.imgUrl ? `<img src="${p.imgUrl}" alt="${p.nome}">` : `<div class="pimg-ph">🍇</div>`}
-        <div class="pimg-edit-layer ${modoAdmin?'on':''}" onclick="event.stopPropagation();triggerProdImg('${p.id}')">
-          <span>📷</span>Trocar foto
-        </div>
-      </div>
-      <div class="pbody">
-        <div class="psize">${p.tamanho}</div>
+      <div class="pcard-info">
         <div class="psub">${p.nome}</div>
+        <div class="psize">${p.tamanho}</div>
+        <div class="pdesc">${p.descricao||''}</div>
         <div class="price-row">
           <span class="price-old">${fmt(p.precoAnt)}</span>
           <span class="price-new">${fmt(p.preco)}</span>
           <span class="disc-badge">${desc(p.precoAnt,p.preco)}</span>
+        </div>
+      </div>
+      <div class="pimg-wrap" id="pimgwrap-${p.id}">
+        ${p.imgUrl ? `<img src="${p.imgUrl}" alt="${p.nome}">` : `<div class="pimg-ph">🍇</div>`}
+        <div class="pimg-edit-layer ${modoAdmin?'on':''}" onclick="event.stopPropagation();triggerProdImg('${p.id}')">
+          <span>📷</span>Trocar
         </div>
       </div>
       <button class="admin-esgotado-toggle" onclick="event.stopPropagation();toggleEsgotado('${p.id}')">
@@ -805,15 +869,19 @@ window.selecionarZona = function() {
   const zona = cfg.zonas.find(z=>z.id===zonaSelId);
   const feeInfo = document.getElementById('zonaFeeInfo');
   const feeVal  = document.getElementById('zonaFeeVal');
-  if(zona){ feeVal.textContent = fmt(zona.taxa); feeInfo.style.display='block'; }
-  else { feeInfo.style.display='none'; }
+  if(zona){
+    feeVal.textContent = zona.gratis ? '🎉 GRÁTIS!' : fmt(zona.taxa);
+    feeVal.style.color = zona.gratis ? 'var(--green)' : '';
+    feeInfo.style.display='block';
+  } else { feeInfo.style.display='none'; }
   atualizarPedido();
 };
 
 function getTaxaEntrega() {
   if(tipoEntrega!=='entrega') return 0;
   const zona = cfg.zonas.find(z=>z.id===zonaSelId);
-  return zona ? zona.taxa : (cfg.zonas.length>0 ? cfg.zonas[0].taxa : 6.99);
+  if(zona) return zona.gratis ? 0 : zona.taxa;
+  return (cfg.zonas.length>0 ? cfg.zonas[0].taxa : 6.99);
 }
 
 function renderZonaSelect() {
@@ -822,14 +890,14 @@ function renderZonaSelect() {
   (cfg.zonas||[]).forEach(z=>{
     const opt = document.createElement('option');
     opt.value = z.id;
-    opt.textContent = `${z.nome} — ${fmt(z.taxa)}`;
+    opt.textContent = z.gratis ? `${z.nome} — 🎉 FRETE GRÁTIS` : `${z.nome} — ${fmt(z.taxa)}`;
     sel.appendChild(opt);
   });
-  // Update min frete label
-  const taxas = (cfg.zonas||[]).map(z=>z.taxa);
+  const taxas = (cfg.zonas||[]).filter(z=>!z.gratis).map(z=>z.taxa);
   const minTaxa = taxas.length ? Math.min(...taxas) : 6.99;
+  const temGratis = (cfg.zonas||[]).some(z=>z.gratis);
   const el = document.getElementById('freteMin');
-  if(el) el.textContent = `a partir de ${fmt(minTaxa)}`;
+  if(el) el.textContent = temGratis ? `grátis para regiões selecionadas` : `a partir de ${fmt(minTaxa)}`;
 }
 
 function calcTotal() {
@@ -1019,12 +1087,19 @@ function renderEntregaInfo() {
 }
 function renderHorario() {
   const h = cfg.horario;
-  const disp   = document.getElementById('horarioDisplay');
-  const footer = document.getElementById('footerHorario');
+  const disp    = document.getElementById('horarioDisplay');
+  const footer  = document.getElementById('footerHorario');
+  const ftag    = document.getElementById('footerHorarioTag');
   if(h && h.dias && h.abre && h.fecha) {
     const txt = `${h.dias} • ${h.abre} às ${h.fecha}`;
-    disp.textContent = txt; footer.textContent = `🕐 ${txt}`;
-  } else { disp.textContent='Não informado'; footer.textContent=''; }
+    if(disp) disp.textContent = txt;
+    if(footer) footer.textContent = `🕐 ${txt}`;
+    if(ftag) ftag.textContent = `🕐 ${txt}`;
+  } else {
+    if(disp) disp.textContent = 'Não informado';
+    if(footer) footer.textContent = '';
+    if(ftag) ftag.textContent = '';
+  }
 }
 
 window.abrirModalHorario = function() {
@@ -1056,7 +1131,7 @@ window.salvarHorario = async function() {
 function abrirNovoProd() {
   document.getElementById('modalProdTitle').textContent = 'Adicionar Produto';
   document.getElementById('npSaveBtn').textContent = 'Adicionar';
-  ['npTamanho','npPrecoAnt','npPreco'].forEach(id=>document.getElementById(id).value='');
+  ['npTamanho','npPrecoAnt','npPreco','npDesc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('npNome').value = 'Açaí Premium';
   document.getElementById('npEditId').value = '';
   abrirModal('modNovoProd');
@@ -1070,6 +1145,7 @@ window.abrirEditProd = function(id) {
   document.getElementById('npPrecoAnt').value = p.precoAnt;
   document.getElementById('npPreco').value    = p.preco;
   document.getElementById('npNome').value     = p.nome;
+  document.getElementById('npDesc').value     = p.descricao||'';
   document.getElementById('npEditId').value   = id;
   abrirModal('modNovoProd');
 };
@@ -1079,15 +1155,16 @@ window.salvarProduto = async function() {
   const pA     = parseFloat(document.getElementById('npPrecoAnt').value);
   const p      = parseFloat(document.getElementById('npPreco').value);
   const nome   = document.getElementById('npNome').value.trim() || 'Açaí Premium';
+  const descricao = document.getElementById('npDesc').value.trim();
   const editId = document.getElementById('npEditId').value;
   if(!tam || isNaN(pA) || isNaN(p) || p<=0 || pA<=0) { toast('Preencha todos os campos!','err'); return; }
   if(editId) {
     const prod = produtos.find(x=>x.id===editId);
-    if(prod){ prod.tamanho=tam; prod.nome=nome; prod.preco=p; prod.precoAnt=pA; }
-    await fbUpdate('produtos', editId, { tamanho:tam, nome, preco:p, precoAnt:pA });
+    if(prod){ prod.tamanho=tam; prod.nome=nome; prod.descricao=descricao; prod.preco=p; prod.precoAnt=pA; }
+    await fbUpdate('produtos', editId, { tamanho:tam, nome, descricao, preco:p, precoAnt:pA });
     toast('✅ Produto atualizado!', 'ok');
   } else {
-    const dados = { tamanho:tam, nome, preco:p, precoAnt:pA, esgotado:false, imgUrl:null, ordem: Date.now() };
+    const dados = { tamanho:tam, nome, descricao, preco:p, precoAnt:pA, esgotado:false, imgUrl:null, ordem: Date.now() };
     const newId = await fbAdd('produtos', dados);
     produtos.push({ id:newId, ...dados });
     toast('✅ Produto adicionado!', 'ok');
@@ -1240,10 +1317,10 @@ window.addEventListener('scroll', () => {
 
 // ── DADOS PADRÃO (primeira vez) ───────────────────
 const PRODUTOS_PADRAO = [
-  { tamanho:'300ml',  nome:'Açaí Premium', preco:13.99, precoAnt:19.99, esgotado:false, imgUrl:null, ordem:1 },
-  { tamanho:'500ml',  nome:'Açaí Premium', preco:18.99, precoAnt:24.99, esgotado:false, imgUrl:null, ordem:2 },
-  { tamanho:'750ml',  nome:'Açaí Premium', preco:24.99, precoAnt:29.99, esgotado:false, imgUrl:null, ordem:3 },
-  { tamanho:'1 Litro',nome:'Açaí Premium', preco:29.99, precoAnt:34.99, esgotado:false, imgUrl:null, ordem:4 },
+  { tamanho:'300ml',  nome:'Açaí Premium', descricao:'Perfeito para matar aquela vontade! Açaí cremoso na medida certa 🍇', preco:13.99, precoAnt:19.99, esgotado:false, imgUrl:null, ordem:1 },
+  { tamanho:'500ml',  nome:'Açaí Premium', descricao:'O favorito da galera! Porção generosa com muito sabor 😍', preco:18.99, precoAnt:24.99, esgotado:false, imgUrl:null, ordem:2 },
+  { tamanho:'750ml',  nome:'Açaí Premium', descricao:'Para quem ama açaí de verdade! Cremoso, gelado e irresistível 🤤', preco:24.99, precoAnt:29.99, esgotado:false, imgUrl:null, ordem:3 },
+  { tamanho:'1 Litro',nome:'Açaí Premium', descricao:'O campeão das famílias! Açaí premium que agrada a todos 👑', preco:29.99, precoAnt:34.99, esgotado:false, imgUrl:null, ordem:4 },
 ];
 const COMPS_PADRAO = [
   { nome:'Leite condensado', preco:4.00, imgUrl:null, ordem:1 },
