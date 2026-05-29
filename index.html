@@ -128,6 +128,21 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .admin-mode .ccard-admin-btns{display:flex;}
 .add-comp-card{min-height:60px;}
 
+/* INLINE EDIT */
+.pcard.editing-inline,.ccard.editing-inline{border-color:var(--gold)!important;box-shadow:0 0 0 2px rgba(201,162,39,.25)!important;cursor:default!important;min-height:unset!important;}
+.pcard.editing-inline:hover,.ccard.editing-inline:hover{transform:none!important;}
+.inline-edit-form{padding:16px;width:100%;display:flex;flex-direction:column;gap:10px;}
+.inline-edit-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.inline-field{display:flex;flex-direction:column;gap:4px;}
+.inline-field label{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.inline-edit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:10px;border-top:1px solid var(--border2);}
+.ie-save{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);color:#86efac;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;}
+.ie-save:hover{background:rgba(34,197,94,.25);}
+.ie-cancel{background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:8px;padding:7px 14px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;}
+.ie-cancel:hover{border-color:var(--muted);}
+.ie-del{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:8px;padding:7px 14px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;margin-left:auto;}
+.ie-del:hover{background:rgba(239,68,68,.25);}
+
 /* ADD CARDS */
 .add-card{background:rgba(201,162,39,.05);border:2px dashed rgba(201,162,39,.25);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:200px;cursor:pointer;transition:var(--tr);color:var(--muted);}
 .add-card:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,162,39,.08);}
@@ -517,8 +532,8 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
     <h3 id="modalProdTitle">Adicionar Produto</h3>
     <div class="mfield"><label>Tamanho / Nome</label><input class="minput" id="npTamanho" placeholder="Ex: 400ml"></div>
     <div class="mrow">
-      <div class="mfield"><label>Preço normal (R$)</label><input class="minput" id="npPrecoAnt" type="number" step="0.01" placeholder="Ex: 22.00"></div>
-      <div class="mfield"><label>Preço com desconto (R$)</label><input class="minput" id="npPreco" type="number" step="0.01" placeholder="Ex: 16.00"></div>
+      <div class="mfield"><label>Preço normal — <s>riscado</s> (R$)</label><input class="minput" id="npPrecoAnt" type="number" step="0.01" min="0" placeholder="0 = sem preço riscado"></div>
+      <div class="mfield"><label>Preço promocional (R$)</label><input class="minput" id="npPreco" type="number" step="0.01" placeholder="Ex: 16.00"></div>
     </div>
     <div class="mfield"><label>Subtítulo</label><input class="minput" id="npNome" placeholder="Açaí Premium" value="Açaí Premium"></div>
     <div class="mfield"><label>Descrição chamativa</label><input class="minput" id="npDesc" placeholder="Ex: Cremoso, gelado e irresistível 🤤"></div>
@@ -531,7 +546,11 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
   <div class="mbox">
     <h3 id="modalCompTitle">Adicionar Complemento</h3>
     <div class="mfield"><label>Nome</label><input class="minput" id="ncNome" placeholder="Ex: Paçoca"></div>
-    <div class="mfield"><label>Preço (R$)</label><input class="minput" id="ncPreco" type="number" step="0.01" placeholder="Ex: 3.50"></div>
+    <div class="mfield"><label>Descrição (opcional)</label><input class="minput" id="ncDesc" placeholder="Ex: Triturada na hora, super crocante"></div>
+    <div class="mrow">
+      <div class="mfield"><label>Preço normal — <s>riscado</s> (R$)</label><input class="minput" id="ncPrecoAnt" type="number" step="0.01" min="0" placeholder="0 = sem preço riscado"></div>
+      <div class="mfield"><label>Preço atual (R$)</label><input class="minput" id="ncPreco" type="number" step="0.01" min="0" placeholder="Ex: 3.50"></div>
+    </div>
     <input type="hidden" id="ncEditId">
     <div class="mactions"><button class="mbtn" onclick="fecharModal('modNovoComp')">Cancelar</button><button class="mbtn primary" id="ncSaveBtn" onclick="salvarComplemento()">Salvar</button></div>
   </div>
@@ -725,16 +744,16 @@ function renderProdutos() {
       ${esgt?`<div class="esgotado-overlay"><span class="esgotado-tag">Esgotado</span></div>`:''}
       <div class="card-admin-btns">
         <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('prod','${p.id}','${p.tamanho}')">✕</button>
-        <button class="cadmin-btn edit" onclick="event.stopPropagation();abrirEditProd('${p.id}')">✏</button>
+        <button class="cadmin-btn edit" onclick="event.stopPropagation();editarProdInline('${p.id}')">✏</button>
       </div>
       <div class="pcard-info">
         <div class="psub">${p.nome}</div>
         <div class="psize">${p.tamanho}</div>
         <div class="pdesc">${p.descricao||''}</div>
         <div class="price-row">
-          <span class="price-old">${fmt(p.precoAnt)}</span>
+          ${p.precoAnt && p.precoAnt > p.preco ? `<span class="price-old">${fmt(p.precoAnt)}</span>` : ''}
           <span class="price-new">${fmt(p.preco)}</span>
-          <span class="disc-badge">${desc(p.precoAnt,p.preco)}</span>
+          ${p.precoAnt && p.precoAnt > p.preco ? `<span class="disc-badge">${desc(p.precoAnt,p.preco)}</span>` : ''}
         </div>
       </div>
       <div class="pimg-wrap" id="pimgwrap-${p.id}">
@@ -799,14 +818,21 @@ function renderComplementos() {
       <div class="cstrip"></div>
       <div class="ccard-admin-btns">
         <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('comp','${c.id}','${c.nome}')">✕</button>
-        <button class="cadmin-btn edit" onclick="event.stopPropagation();abrirEditComp('${c.id}')">✏</button>
+        <button class="cadmin-btn edit" onclick="event.stopPropagation();editarCompInline('${c.id}')">✏</button>
       </div>
       <div class="cimg-wrap" id="cimgwrap-${c.id}">
         ${c.imgUrl ? `<img src="${c.imgUrl}" alt="${c.nome}">` : `<div class="cimg-ph">${emoji(c.nome)}</div>`}
         <div class="cimg-edit-layer ${modoAdmin?'on':''}" onclick="event.stopPropagation();triggerCompImg('${c.id}')">📷</div>
       </div>
       <div class="cbody">
-        <div><div class="cname">${c.nome}</div><div class="cprice">+${fmt(c.preco)}</div></div>
+        <div>
+          <div class="cname">${c.nome}</div>
+          ${c.descricao ? `<div style="font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px;">${c.descricao}</div>` : ''}
+          <div class="price-row" style="margin-top:4px;">
+            ${c.precoAnt && c.precoAnt > c.preco ? `<span class="price-old">${fmt(c.precoAnt)}</span>` : ''}
+            <span class="cprice">${c.preco > 0 ? '+'+fmt(c.preco) : 'Grátis'}</span>
+          </div>
+        </div>
         <div class="ccheck">${sel?'✓':''}</div>
       </div>
       <input type="file" id="cf-${c.id}" accept="image/*" onchange="uploadCompImg(event,'${c.id}')">
@@ -1127,7 +1153,126 @@ window.salvarHorario = async function() {
   }
 };
 
-// ── ADD/EDIT PRODUTO ──────────────────────────────
+// ── INLINE EDIT PRODUTO ───────────────────────────
+window.editarProdInline = function(id) {
+  const p = produtos.find(x=>x.id===id); if(!p) return;
+  const card = document.getElementById('pcard-'+id);
+  if(!card) return;
+  card.classList.add('editing-inline');
+  card.innerHTML = `
+    <div class="inline-edit-form" onclick="event.stopPropagation()">
+      <div class="inline-edit-row">
+        <div class="inline-field">
+          <label>Tamanho / título</label>
+          <input class="minput" id="ie-tam-${id}" value="${escHtml(p.tamanho)}" placeholder="Ex: 500ml">
+        </div>
+        <div class="inline-field">
+          <label>Subtítulo</label>
+          <input class="minput" id="ie-nome-${id}" value="${escHtml(p.nome)}" placeholder="Açaí Premium">
+        </div>
+      </div>
+      <div class="inline-field">
+        <label>Descrição</label>
+        <input class="minput" id="ie-desc-${id}" value="${escHtml(p.descricao||'')}" placeholder="Descrição chamativa...">
+      </div>
+      <div class="inline-edit-row">
+        <div class="inline-field">
+          <label>Preço normal — <s style="opacity:.6">riscado</s> (R$)</label>
+          <input class="minput" type="number" step="0.01" min="0" id="ie-pant-${id}" value="${p.precoAnt||''}" placeholder="0 = sem risco">
+        </div>
+        <div class="inline-field">
+          <label>Preço promocional (R$) ★</label>
+          <input class="minput" type="number" step="0.01" id="ie-preco-${id}" value="${p.preco}">
+        </div>
+      </div>
+      <div class="inline-edit-actions">
+        <button class="ie-save" onclick="salvarProdInline('${id}')">✅ Salvar</button>
+        <button class="ie-cancel" onclick="renderProdutos()">Cancelar</button>
+        <button class="ie-del" onclick="confirmarDel('prod','${id}','${escHtml(p.tamanho)}')">🗑 Remover</button>
+      </div>
+    </div>
+  `;
+  setTimeout(()=>document.getElementById('ie-tam-'+id)?.focus(), 50);
+};
+
+window.salvarProdInline = async function(id) {
+  const tam     = document.getElementById('ie-tam-'+id)?.value.trim();
+  const nome    = document.getElementById('ie-nome-'+id)?.value.trim() || 'Açaí Premium';
+  const descricao = document.getElementById('ie-desc-'+id)?.value.trim();
+  const pAnt    = parseFloat(document.getElementById('ie-pant-'+id)?.value) || 0;
+  const preco   = parseFloat(document.getElementById('ie-preco-'+id)?.value);
+  if(!tam || isNaN(preco) || preco <= 0) { toast('Preencha tamanho e preço!','err'); return; }
+  const btn = document.querySelector(`#pcard-${id} .ie-save`);
+  if(btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
+  try {
+    const prod = produtos.find(x=>x.id===id);
+    if(prod){ prod.tamanho=tam; prod.nome=nome; prod.descricao=descricao; prod.preco=preco; prod.precoAnt=pAnt; }
+    await fbUpdate('produtos', id, { tamanho:tam, nome, descricao, preco, precoAnt:pAnt });
+    renderProdutos();
+    toast('✅ Produto salvo!', 'ok');
+  } catch(e) { toast('❌ Erro ao salvar: '+e.message,'err'); if(btn){btn.textContent='✅ Salvar';btn.disabled=false;} }
+};
+
+// ── INLINE EDIT COMPLEMENTO ───────────────────────
+window.editarCompInline = function(id) {
+  const c = complementos.find(x=>x.id===id); if(!c) return;
+  const card = document.getElementById('ccard-'+id);
+  if(!card) return;
+  card.classList.add('editing-inline');
+  card.innerHTML = `
+    <div class="inline-edit-form" onclick="event.stopPropagation()">
+      <div class="inline-edit-row">
+        <div class="inline-field">
+          <label>Nome</label>
+          <input class="minput" id="iec-nome-${id}" value="${escHtml(c.nome)}" placeholder="Ex: Granola">
+        </div>
+        <div class="inline-field">
+          <label>Descrição (opcional)</label>
+          <input class="minput" id="iec-desc-${id}" value="${escHtml(c.descricao||'')}" placeholder="Ex: Crocante e saborosa">
+        </div>
+      </div>
+      <div class="inline-edit-row">
+        <div class="inline-field">
+          <label>Preço normal — <s style="opacity:.6">riscado</s> (R$)</label>
+          <input class="minput" type="number" step="0.01" min="0" id="iec-pant-${id}" value="${c.precoAnt||''}" placeholder="0 = sem risco">
+        </div>
+        <div class="inline-field">
+          <label>Preço atual (R$) ★</label>
+          <input class="minput" type="number" step="0.01" min="0" id="iec-preco-${id}" value="${c.preco}">
+        </div>
+      </div>
+      <div class="inline-edit-actions">
+        <button class="ie-save" onclick="salvarCompInline('${id}')">✅ Salvar</button>
+        <button class="ie-cancel" onclick="renderComplementos()">Cancelar</button>
+        <button class="ie-del" onclick="confirmarDel('comp','${id}','${escHtml(c.nome)}')">🗑 Remover</button>
+      </div>
+    </div>
+  `;
+  setTimeout(()=>document.getElementById('iec-nome-'+id)?.focus(), 50);
+};
+
+window.salvarCompInline = async function(id) {
+  const nome     = document.getElementById('iec-nome-'+id)?.value.trim();
+  const descricao= document.getElementById('iec-desc-'+id)?.value.trim();
+  const pAnt     = parseFloat(document.getElementById('iec-pant-'+id)?.value) || 0;
+  const preco    = parseFloat(document.getElementById('iec-preco-'+id)?.value);
+  if(!nome) { toast('Preencha o nome!','err'); return; }
+  if(isNaN(preco) || preco < 0) { toast('Preço inválido!','err'); return; }
+  const btn = document.querySelector(`#ccard-${id} .ie-save`);
+  if(btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
+  try {
+    const comp = complementos.find(x=>x.id===id);
+    if(comp){ comp.nome=nome; comp.descricao=descricao; comp.preco=preco; comp.precoAnt=pAnt; }
+    await fbUpdate('complementos', id, { nome, descricao, preco, precoAnt:pAnt });
+    renderComplementos();
+    toast('✅ Complemento salvo!', 'ok');
+  } catch(e) { toast('❌ Erro ao salvar: '+e.message,'err'); if(btn){btn.textContent='✅ Salvar';btn.disabled=false;} }
+};
+
+// helper para evitar XSS nos campos inline
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── ADD/EDIT PRODUTO (modal — mantido para "novo produto") ─
 function abrirNovoProd() {
   document.getElementById('modalProdTitle').textContent = 'Adicionar Produto';
   document.getElementById('npSaveBtn').textContent = 'Adicionar';
@@ -1152,12 +1297,12 @@ window.abrirEditProd = function(id) {
 
 window.salvarProduto = async function() {
   const tam    = document.getElementById('npTamanho').value.trim();
-  const pA     = parseFloat(document.getElementById('npPrecoAnt').value);
+  const pA     = parseFloat(document.getElementById('npPrecoAnt').value) || 0;
   const p      = parseFloat(document.getElementById('npPreco').value);
   const nome   = document.getElementById('npNome').value.trim() || 'Açaí Premium';
   const descricao = document.getElementById('npDesc').value.trim();
   const editId = document.getElementById('npEditId').value;
-  if(!tam || isNaN(pA) || isNaN(p) || p<=0 || pA<=0) { toast('Preencha todos os campos!','err'); return; }
+  if(!tam || isNaN(p) || p<=0) { toast('Preencha tamanho e preço!','err'); return; }
   if(editId) {
     const prod = produtos.find(x=>x.id===editId);
     if(prod){ prod.tamanho=tam; prod.nome=nome; prod.descricao=descricao; prod.preco=p; prod.precoAnt=pA; }
@@ -1177,6 +1322,8 @@ function abrirNovoComp() {
   document.getElementById('modalCompTitle').textContent = 'Adicionar Complemento';
   document.getElementById('ncSaveBtn').textContent = 'Adicionar';
   document.getElementById('ncNome').value = '';
+  document.getElementById('ncDesc').value = '';
+  document.getElementById('ncPrecoAnt').value = '';
   document.getElementById('ncPreco').value = '';
   document.getElementById('ncEditId').value = '';
   abrirModal('modNovoComp');
@@ -1186,26 +1333,33 @@ window.abrirEditComp = function(id) {
   const c = complementos.find(x=>x.id===id); if(!c) return;
   document.getElementById('modalCompTitle').textContent = 'Editar Complemento';
   document.getElementById('ncSaveBtn').textContent = 'Salvar';
-  document.getElementById('ncNome').value  = c.nome;
-  document.getElementById('ncPreco').value = c.preco;
-  document.getElementById('ncEditId').value = id;
+  document.getElementById('ncNome').value     = c.nome;
+  document.getElementById('ncDesc').value     = c.descricao || '';
+  document.getElementById('ncPrecoAnt').value = c.precoAnt || '';
+  document.getElementById('ncPreco').value    = c.preco;
+  document.getElementById('ncEditId').value   = id;
   abrirModal('modNovoComp');
 };
 
 window.salvarComplemento = async function() {
-  const nome   = document.getElementById('ncNome').value.trim();
-  const p      = parseFloat(document.getElementById('ncPreco').value);
-  const editId = document.getElementById('ncEditId').value;
-  if(!nome || isNaN(p) || p<=0) { toast('Preencha todos os campos!','err'); return; }
+  const nome     = document.getElementById('ncNome').value.trim();
+  const descricao= document.getElementById('ncDesc').value.trim();
+  const pAntVal  = document.getElementById('ncPrecoAnt').value;
+  const pAnt     = pAntVal === '' ? 0 : parseFloat(pAntVal);
+  const p        = parseFloat(document.getElementById('ncPreco').value);
+  const editId   = document.getElementById('ncEditId').value;
+  if(!nome) { toast('Preencha o nome!','err'); return; }
+  if(isNaN(p) || p < 0) { toast('Preço inválido!','err'); return; }
+  const dados = { nome, descricao, preco: p, precoAnt: isNaN(pAnt) ? 0 : pAnt };
   if(editId) {
     const c = complementos.find(x=>x.id===editId);
-    if(c){ c.nome=nome; c.preco=p; }
-    await fbUpdate('complementos', editId, { nome, preco:p });
+    if(c){ Object.assign(c, dados); }
+    await fbUpdate('complementos', editId, dados);
     toast('✅ Complemento atualizado!', 'ok');
   } else {
-    const dados = { nome, preco:p, imgUrl:null, ordem: Date.now() };
-    const newId = await fbAdd('complementos', dados);
-    complementos.push({ id:newId, ...dados });
+    const newDados = { ...dados, imgUrl:null, ordem: Date.now() };
+    const newId = await fbAdd('complementos', newDados);
+    complementos.push({ id:newId, ...newDados });
     toast('✅ Complemento adicionado!', 'ok');
   }
   fecharModal('modNovoComp'); renderComplementos();
