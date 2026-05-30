@@ -1276,20 +1276,26 @@ window.selecionarVariante = function(p, v) {
 
 // ── INLINE EDIT PRODUTO ───────────────────────────
 window._varInline = {}; // { [prodId]: variantes[] }
+window._tipoInline = {}; // { [prodId]: 'simples'|'variantes' }
 
 window.editarProdInline = function(id) {
   const p = produtos.find(x=>x.id===id); if(!p) return;
   const card = document.getElementById('pcard-'+id);
   if(!card) return;
-  const isVar = p.tipo === 'variantes';
-  _varInline[id] = isVar ? JSON.parse(JSON.stringify(p.variantes||[])) : [];
+
+  const tipoAtual = p.tipo === 'variantes' ? 'variantes' : 'simples';
+  window._tipoInline[id] = tipoAtual;
+  window._varInline[id]  = tipoAtual === 'variantes'
+    ? JSON.parse(JSON.stringify(p.variantes || []))
+    : [];
 
   card.classList.add('editing-inline');
   card.innerHTML = `
     <div class="inline-edit-form" onclick="event.stopPropagation()">
+
       <div class="inline-edit-row">
         <div class="inline-field">
-          <label>${isVar ? 'Nome do anúncio' : 'Subtítulo'}</label>
+          <label>Nome / subtítulo</label>
           <input class="minput" id="ie-nome-${id}" value="${escHtml(p.nome||'')}" placeholder="Açaí Premium">
         </div>
         <div class="inline-field">
@@ -1298,39 +1304,84 @@ window.editarProdInline = function(id) {
         </div>
       </div>
 
-      ${isVar ? `
-        <!-- VARIANTES INLINE -->
-        <div style="font-size:11px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin:6px 0 4px">Variantes de tamanho</div>
-        <div id="ie-var-list-${id}"></div>
-        <button class="var-add-btn" style="margin-bottom:8px" onclick="addVarInline('${id}')">+ Adicionar tamanho</button>
-      ` : `
-        <!-- SIMPLES INLINE -->
-        <div class="inline-edit-row three">
-          <div class="inline-field">
-            <label>Tamanho / título</label>
-            <input class="minput" id="ie-tam-${id}" value="${escHtml(p.tamanho||'')}" placeholder="Ex: 500ml">
-          </div>
-          <div class="inline-field">
-            <label>Preço <s style="opacity:.6">riscado</s></label>
-            <input class="minput" type="number" step="0.01" min="0" id="ie-pant-${id}" value="${p.precoAnt||''}" placeholder="0 = sem risco">
-          </div>
-          <div class="inline-field">
-            <label>Preço promocional ★</label>
-            <input class="minput" type="number" step="0.01" id="ie-preco-${id}" value="${p.preco||''}">
-          </div>
+      <div class="inline-field" style="margin-bottom:2px">
+        <label style="margin-bottom:6px;display:block">Tipo do produto</label>
+        <div class="tipo-toggle" id="ie-tipo-toggle-${id}">
+          <button class="tipo-btn ${tipoAtual==='simples'?'active':''}"
+            id="ie-tipo-simples-${id}"
+            onclick="trocaTipoInline('${id}','simples')">📦 Produto simples</button>
+          <button class="tipo-btn ${tipoAtual==='variantes'?'active':''}"
+            id="ie-tipo-var-${id}"
+            onclick="trocaTipoInline('${id}','variantes')">🎛 Com variantes</button>
         </div>
-      `}
+      </div>
+
+      <div id="ie-campos-${id}"></div>
 
       <div class="inline-edit-actions">
-        <button class="ie-save" onclick="salvarProdInline('${id}','${isVar?'variantes':'simples'}')">✅ Salvar</button>
+        <button class="ie-save" id="ie-save-${id}" onclick="salvarProdInline('${id}')">✅ Salvar</button>
         <button class="ie-cancel" onclick="renderProdutos()">Cancelar</button>
         <button class="ie-del" onclick="confirmarDel('prod','${id}','${escHtml(p.nome||p.tamanho)}')">🗑 Remover</button>
       </div>
     </div>
   `;
-  if(isVar) renderVarInline(id);
+
+  renderCamposInline(id, p);
   setTimeout(()=>document.getElementById('ie-nome-'+id)?.focus(), 50);
 };
+
+// Troca o tipo de produto dentro do card inline
+window.trocaTipoInline = function(id, novoTipo) {
+  const p = produtos.find(x=>x.id===id);
+  window._tipoInline[id] = novoTipo;
+
+  document.getElementById('ie-tipo-simples-'+id)?.classList.toggle('active', novoTipo==='simples');
+  document.getElementById('ie-tipo-var-'+id)?.classList.toggle('active', novoTipo==='variantes');
+
+  // Se trocar para variantes e ainda não tem nenhuma, pré-preenche com os dados simples atuais
+  if(novoTipo === 'variantes' && window._varInline[id].length === 0 && p) {
+    if(p.tamanho && p.preco) {
+      window._varInline[id] = [{ id:'v'+Date.now(), tamanho: p.tamanho, preco: p.preco, precoAnt: p.precoAnt||0 }];
+    }
+  }
+  renderCamposInline(id, p);
+};
+
+// Renderiza a seção de campos (simples ou variantes) dentro do card
+function renderCamposInline(id, p) {
+  const wrap = document.getElementById('ie-campos-'+id);
+  if(!wrap) return;
+  const tipo = window._tipoInline[id] || 'simples';
+
+  if(tipo === 'variantes') {
+    wrap.innerHTML = `
+      <div style="font-size:11px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin:8px 0 4px">Variantes de tamanho</div>
+      <div id="ie-var-list-${id}"></div>
+      <button class="var-add-btn" style="margin-bottom:8px" onclick="addVarInline('${id}')">+ Adicionar tamanho</button>
+    `;
+    renderVarInline(id);
+  } else {
+    const tam  = p && p.tipo!=='variantes' ? (p.tamanho||'') : '';
+    const pAnt = p && p.tipo!=='variantes' ? (p.precoAnt||'') : '';
+    const preco= p && p.tipo!=='variantes' ? (p.preco||'') : '';
+    wrap.innerHTML = `
+      <div class="inline-edit-row three">
+        <div class="inline-field">
+          <label>Tamanho / título</label>
+          <input class="minput" id="ie-tam-${id}" value="${escHtml(tam)}" placeholder="Ex: 500ml">
+        </div>
+        <div class="inline-field">
+          <label>Preço <s style="opacity:.6">riscado</s></label>
+          <input class="minput" type="number" step="0.01" min="0" id="ie-pant-${id}" value="${pAnt}" placeholder="0 = sem risco">
+        </div>
+        <div class="inline-field">
+          <label>Preço promocional ★</label>
+          <input class="minput" type="number" step="0.01" id="ie-preco-${id}" value="${preco}">
+        </div>
+      </div>
+    `;
+  }
+}
 
 function renderVarInline(prodId) {
   const list = document.getElementById('ie-var-list-'+prodId);
@@ -1373,14 +1424,15 @@ window.addVarInline = function(prodId) {
   }, 30);
 };
 
-window.salvarProdInline = async function(id, tipo) {
+window.salvarProdInline = async function(id) {
   const nome     = document.getElementById('ie-nome-'+id)?.value.trim() || 'Açaí Premium';
   const descricao= document.getElementById('ie-desc-'+id)?.value.trim() || '';
-  const btn = document.querySelector(`#pcard-${id} .ie-save`);
+  const tipo     = window._tipoInline[id] || 'simples';
+  const btn      = document.getElementById('ie-save-'+id);
 
   let dados;
   if(tipo === 'variantes') {
-    const vars = (_varInline[id]||[]).filter(v => v.tamanho.trim() && v.preco > 0);
+    const vars = (window._varInline[id]||[]).filter(v => v.tamanho.trim() && v.preco > 0);
     if(vars.length === 0) { toast('Adicione pelo menos uma variante com tamanho e preço!','err'); return; }
     const minPreco = Math.min(...vars.map(v=>v.preco));
     dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes:vars, preco:minPreco, tamanho:'' };
@@ -1397,7 +1449,8 @@ window.salvarProdInline = async function(id, tipo) {
     const prod = produtos.find(x=>x.id===id);
     if(prod) Object.assign(prod, dados);
     await fbUpdate('produtos', id, dados);
-    delete _varInline[id];
+    delete window._varInline[id];
+    delete window._tipoInline[id];
     renderProdutos();
     toast('✅ Produto salvo!', 'ok');
   } catch(e) {
