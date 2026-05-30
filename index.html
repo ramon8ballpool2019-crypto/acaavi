@@ -133,6 +133,7 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .pcard.editing-inline:hover,.ccard.editing-inline:hover{transform:none!important;}
 .inline-edit-form{padding:16px;width:100%;display:flex;flex-direction:column;gap:10px;}
 .inline-edit-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.inline-edit-row.three{grid-template-columns:1fr 90px 100px;}
 .inline-field{display:flex;flex-direction:column;gap:4px;}
 .inline-field label{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
 .inline-edit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:10px;border-top:1px solid var(--border2);}
@@ -142,6 +143,32 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .ie-cancel:hover{border-color:var(--muted);}
 .ie-del{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:8px;padding:7px 14px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;margin-left:auto;}
 .ie-del:hover{background:rgba(239,68,68,.25);}
+
+/* VARIANTES */
+.var-from{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;}
+.var-count{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:rgba(201,162,39,.12);color:var(--gold);border:1px solid rgba(201,162,39,.25);border-radius:20px;padding:2px 8px;margin-top:4px;}
+.var-sel-tag{font-size:11px;color:var(--gold);background:rgba(201,162,39,.1);border-radius:4px;padding:2px 8px;margin-top:4px;display:inline-block;}
+.var-list{display:flex;flex-direction:column;gap:8px;margin:8px 0;}
+.var-opt{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;cursor:pointer;transition:var(--tr);}
+.var-opt:hover{border-color:rgba(201,162,39,.4);background:rgba(201,162,39,.06);}
+.var-opt.selected{border-color:var(--gold);background:rgba(201,162,39,.1);}
+.var-opt-name{font-size:15px;font-weight:600;}
+.var-opt-prices{display:flex;align-items:center;gap:8px;}
+.var-opt-old{font-size:12px;color:var(--muted);text-decoration:line-through;}
+.var-opt-preco{font-size:16px;font-weight:700;color:var(--gold-l);}
+/* admin variantes editor */
+.var-admin-item{display:grid;grid-template-columns:1fr 90px 90px 32px;gap:6px;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;margin-bottom:6px;}
+.var-admin-item input{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;width:100%;}
+.var-admin-item input:focus{outline:none;border-color:var(--gold);}
+.var-admin-del{width:28px;height:28px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.var-admin-del:hover{background:rgba(239,68,68,.4);}
+.cadmin-btn.up,.cadmin-btn.dn{background:rgba(255,255,255,.1);color:var(--text);font-size:11px;}
+.cadmin-btn.up:hover,.cadmin-btn.dn:hover{background:rgba(255,255,255,.22);}
+.var-add-btn{width:100%;background:rgba(201,162,39,.05);border:1px dashed rgba(201,162,39,.3);color:var(--gold);border-radius:8px;padding:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;}
+.var-add-btn:hover{background:rgba(201,162,39,.1);}
+.tipo-toggle{display:flex;gap:6px;margin-bottom:12px;}
+.tipo-btn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:.2s;}
+.tipo-btn.active{border-color:var(--gold);background:rgba(201,162,39,.1);color:var(--gold-l);}
 
 /* ADD CARDS */
 .add-card{background:rgba(201,162,39,.05);border:2px dashed rgba(201,162,39,.25);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:200px;cursor:pointer;transition:var(--tr);color:var(--muted);}
@@ -527,16 +554,42 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
   </div>
 </div>
 
+<!-- MODAL VARIANTES (cliente escolhe tamanho) -->
+<div class="moverlay" id="modVariantes">
+  <div class="mbox">
+    <div class="psub" id="varProdSubtitulo" style="margin-bottom:4px"></div>
+    <h3 id="varProdNome" style="margin-bottom:4px">Escolha o tamanho</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Selecione uma opção para continuar</p>
+    <div class="var-list" id="varList"></div>
+    <div class="mactions"><button class="mbtn" onclick="fecharModal('modVariantes')">Cancelar</button></div>
+  </div>
+</div>
+
 <div class="moverlay" id="modNovoProd">
   <div class="mbox">
     <h3 id="modalProdTitle">Adicionar Produto</h3>
-    <div class="mfield"><label>Tamanho / Nome</label><input class="minput" id="npTamanho" placeholder="Ex: 400ml"></div>
-    <div class="mrow">
-      <div class="mfield"><label>Preço normal — <s>riscado</s> (R$)</label><input class="minput" id="npPrecoAnt" type="number" step="0.01" min="0" placeholder="0 = sem preço riscado"></div>
-      <div class="mfield"><label>Preço promocional (R$)</label><input class="minput" id="npPreco" type="number" step="0.01" placeholder="Ex: 16.00"></div>
-    </div>
-    <div class="mfield"><label>Subtítulo</label><input class="minput" id="npNome" placeholder="Açaí Premium" value="Açaí Premium"></div>
+    <div class="mfield"><label>Subtítulo / Nome</label><input class="minput" id="npNome" placeholder="Açaí Premium" value="Açaí Premium"></div>
     <div class="mfield"><label>Descrição chamativa</label><input class="minput" id="npDesc" placeholder="Ex: Cremoso, gelado e irresistível 🤤"></div>
+    <div class="mfield" style="margin-bottom:6px"><label style="margin-bottom:6px;display:block">Tipo de produto</label>
+      <div class="tipo-toggle">
+        <button class="tipo-btn active" id="tipoBtnSimples" onclick="setTipoProd('simples')">📦 Produto simples</button>
+        <button class="tipo-btn" id="tipoBtnVariantes" onclick="setTipoProd('variantes')">🎛 Com variantes de tamanho</button>
+      </div>
+    </div>
+    <!-- SIMPLES -->
+    <div id="npCamposSimples">
+      <div class="mfield"><label>Tamanho / Nome</label><input class="minput" id="npTamanho" placeholder="Ex: 400ml"></div>
+      <div class="mrow">
+        <div class="mfield"><label>Preço normal — <s>riscado</s> (R$)</label><input class="minput" id="npPrecoAnt" type="number" step="0.01" min="0" placeholder="0 = sem preço riscado"></div>
+        <div class="mfield"><label>Preço promocional (R$)</label><input class="minput" id="npPreco" type="number" step="0.01" placeholder="Ex: 16.00"></div>
+      </div>
+    </div>
+    <!-- VARIANTES -->
+    <div id="npCamposVariantes" style="display:none">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Adicione os tamanhos e preços. O cliente vai escolher na hora do pedido.</div>
+      <div id="npVariantesList"></div>
+      <button class="var-add-btn" onclick="addVarianteModal()">+ Adicionar tamanho</button>
+    </div>
     <input type="hidden" id="npEditId">
     <div class="mactions"><button class="mbtn" onclick="fecharModal('modNovoProd')">Cancelar</button><button class="mbtn primary" id="npSaveBtn" onclick="salvarProduto()">Salvar</button></div>
   </div>
@@ -734,27 +787,50 @@ function renderLogo() {
 function renderProdutos() {
   const g = document.getElementById('prodGrid'); g.innerHTML = '';
   produtos.forEach(p => {
+    const isVar = p.tipo === 'variantes' && Array.isArray(p.variantes) && p.variantes.length > 0;
     const sel  = prodSel && prodSel.id === p.id;
     const esgt = !!p.esgotado;
     const d = document.createElement('div');
     d.className = 'pcard' + (sel?' selected':'') + (esgt?' esgotado-card':'');
     d.id = 'pcard-'+p.id;
-    d.innerHTML = `
-      <div class="sel-badge">✓</div>
-      ${esgt?`<div class="esgotado-overlay"><span class="esgotado-tag">Esgotado</span></div>`:''}
-      <div class="card-admin-btns">
-        <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('prod','${p.id}','${p.tamanho}')">✕</button>
-        <button class="cadmin-btn edit" onclick="event.stopPropagation();editarProdInline('${p.id}')">✏</button>
-      </div>
-      <div class="pcard-info">
-        <div class="psub">${p.nome}</div>
-        <div class="psize">${p.tamanho}</div>
-        <div class="pdesc">${p.descricao||''}</div>
+
+    // price display
+    let priceHtml;
+    if(isVar) {
+      const precos = p.variantes.map(v=>v.preco);
+      const minP = Math.min(...precos);
+      priceHtml = `
+        <div class="var-from">a partir de</div>
+        <div class="price-row">
+          <span class="price-new">${fmt(minP)}</span>
+        </div>
+        <div class="var-count">🎛 ${p.variantes.length} tamanhos</div>
+        ${sel && prodSel.varianteSel ? `<div class="var-sel-tag">✓ ${prodSel.varianteSel.tamanho} — ${fmt(prodSel.varianteSel.preco)}</div>` : ''}
+      `;
+    } else {
+      priceHtml = `
         <div class="price-row">
           ${p.precoAnt && p.precoAnt > p.preco ? `<span class="price-old">${fmt(p.precoAnt)}</span>` : ''}
           <span class="price-new">${fmt(p.preco)}</span>
           ${p.precoAnt && p.precoAnt > p.preco ? `<span class="disc-badge">${desc(p.precoAnt,p.preco)}</span>` : ''}
         </div>
+      `;
+    }
+
+    d.innerHTML = `
+      <div class="sel-badge">✓</div>
+      ${esgt?`<div class="esgotado-overlay"><span class="esgotado-tag">Esgotado</span></div>`:''}
+      <div class="card-admin-btns">
+        <button class="cadmin-btn up" onclick="event.stopPropagation();moverProd('${p.id}',-1)" title="Mover para cima">▲</button>
+        <button class="cadmin-btn dn" onclick="event.stopPropagation();moverProd('${p.id}',1)"  title="Mover para baixo">▼</button>
+        <button class="cadmin-btn edit" onclick="event.stopPropagation();editarProdInline('${p.id}')">✏</button>
+        <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('prod','${p.id}','${p.nome||p.tamanho}')">✕</button>
+      </div>
+      <div class="pcard-info">
+        <div class="psub">${p.nome}</div>
+        <div class="psize">${isVar ? (p.titulo||p.nome) : p.tamanho}</div>
+        <div class="pdesc">${p.descricao||''}</div>
+        ${priceHtml}
       </div>
       <div class="pimg-wrap" id="pimgwrap-${p.id}">
         ${p.imgUrl ? `<img src="${p.imgUrl}" alt="${p.nome}">` : `<div class="pimg-ph">🍇</div>`}
@@ -767,7 +843,11 @@ function renderProdutos() {
       </button>
       <input type="file" id="pf-${p.id}" accept="image/*" onchange="uploadProdImg(event,'${p.id}')">
     `;
-    d.addEventListener('click', () => { if(!modoAdmin && !esgt) selecionarProd(p); });
+    d.addEventListener('click', () => {
+      if(modoAdmin || esgt) return;
+      if(isVar) abrirVariantePicker(p);
+      else selecionarProd(p);
+    });
     g.appendChild(d);
   });
   if(modoAdmin) {
@@ -817,8 +897,10 @@ function renderComplementos() {
     d.innerHTML = `
       <div class="cstrip"></div>
       <div class="ccard-admin-btns">
-        <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('comp','${c.id}','${c.nome}')">✕</button>
+        <button class="cadmin-btn up" onclick="event.stopPropagation();moverComp('${c.id}',-1)" title="Mover para cima">▲</button>
+        <button class="cadmin-btn dn" onclick="event.stopPropagation();moverComp('${c.id}',1)"  title="Mover para baixo">▼</button>
         <button class="cadmin-btn edit" onclick="event.stopPropagation();editarCompInline('${c.id}')">✏</button>
+        <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('comp','${c.id}','${c.nome}')">✕</button>
       </div>
       <div class="cimg-wrap" id="cimgwrap-${c.id}">
         ${c.imgUrl ? `<img src="${c.imgUrl}" alt="${c.nome}">` : `<div class="cimg-ph">${emoji(c.nome)}</div>`}
@@ -928,7 +1010,8 @@ function renderZonaSelect() {
 
 function calcTotal() {
   if(!prodSel) return 0;
-  let t = prodSel.preco;
+  const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
+  let t = precoBase;
   complementos.forEach(c => { if(compsSel.has(c.id)) t += c.preco; });
   t += getTaxaEntrega();
   return t;
@@ -953,9 +1036,11 @@ function atualizarPedido() {
     flt.classList.remove('show'); pixS.classList.remove('open'); return;
   }
 
-  let total = prodSel.preco;
+  const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
+  const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
+  let total = precoBase;
   const scs = complementos.filter(c => compsSel.has(c.id));
-  let html = `<div class="order-line"><div class="order-line-info"><div class="order-line-name">🍇 ${prodSel.nome} ${prodSel.tamanho}</div><div class="order-line-price">${fmt(prodSel.preco)}</div></div><button class="order-line-remove" onclick="removerProdPedido()">✕ Remover</button></div>`;
+  let html = `<div class="order-line"><div class="order-line-info"><div class="order-line-name">🍇 ${prodSel.nome} ${labelTamanho}</div><div class="order-line-price">${fmt(precoBase)}</div></div><button class="order-line-remove" onclick="removerProdPedido()">✕ Remover</button></div>`;
   scs.forEach(c => {
     total += c.preco;
     html += `<div class="order-line"><div class="order-line-info"><div class="order-line-name">+ ${c.nome}</div><div class="order-line-price">${fmt(c.preco)}</div></div><button class="order-line-remove" onclick="removerCompPedido('${c.id}')">✕ Remover</button></div>`;
@@ -979,7 +1064,9 @@ window.abrirConfirmacaoPedido = function(tipo) {
   if(!prodSel) return;
   const scs = complementos.filter(c => compsSel.has(c.id));
   const total = calcTotal();
-  let html = `<div class="confirm-item"><span>🍇 ${prodSel.nome} ${prodSel.tamanho}</span><span>${fmt(prodSel.preco)}</span></div>`;
+  const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
+  const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
+  let html = `<div class="confirm-item"><span>🍇 ${prodSel.nome} ${labelTamanho}</span><span>${fmt(precoBase)}</span></div>`;
   scs.forEach(c => { html+=`<div class="confirm-item"><span>+ ${c.nome}</span><span>${fmt(c.preco)}</span></div>`; });
   if(tipoEntrega==='entrega') {
     const taxa = getTaxaEntrega();
@@ -1042,7 +1129,9 @@ window.enviarWhats = function() {
   const obs  = document.getElementById('obsArea').value.trim();
   const scs  = complementos.filter(c => compsSel.has(c.id));
   const total = calcTotal();
-  let msg = `🍇 *Pedido Açaví*\n\n*${prodSel.nome} ${prodSel.tamanho}* — ${fmt(prodSel.preco)}\n`;
+  const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
+  const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
+  let msg = `🍇 *Pedido Açaví*\n\n*${prodSel.nome} ${labelTamanho}* — ${fmt(precoBase)}\n`;
   if(scs.length){ msg+=`\n*Complementos:*\n`; scs.forEach(c=>{ msg+=`• ${c.nome} — ${fmt(c.preco)}\n`; }); }
   if(tipoEntrega==='entrega') {
     const taxa = getTaxaEntrega();
@@ -1153,64 +1242,168 @@ window.salvarHorario = async function() {
   }
 };
 
+// ── VARIANT PICKER (cliente) ──────────────────────
+window.abrirVariantePicker = function(p) {
+  document.getElementById('varProdNome').textContent = p.titulo || p.nome || 'Escolha o tamanho';
+  document.getElementById('varProdSubtitulo').textContent = p.nome || '';
+  const list = document.getElementById('varList');
+  const selId = (prodSel && prodSel.id===p.id && prodSel.varianteSel) ? prodSel.varianteSel.id : null;
+  list.innerHTML = '';
+  (p.variantes||[]).forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'var-opt' + (selId===v.id?' selected':'');
+    div.innerHTML = `
+      <span class="var-opt-name">${v.tamanho}</span>
+      <div class="var-opt-prices">
+        ${v.precoAnt && v.precoAnt > v.preco ? `<span class="var-opt-old">${fmt(v.precoAnt)}</span>` : ''}
+        <span class="var-opt-preco">${fmt(v.preco)}</span>
+        ${v.precoAnt && v.precoAnt > v.preco ? `<span class="disc-badge">${desc(v.precoAnt,v.preco)}</span>` : ''}
+      </div>
+    `;
+    div.onclick = () => selecionarVariante(p, v);
+    list.appendChild(div);
+  });
+  abrirModal('modVariantes');
+};
+
+window.selecionarVariante = function(p, v) {
+  prodSel = { ...p, varianteSel: v };
+  fecharModal('modVariantes');
+  renderProdutos();
+  atualizarPedido();
+  document.getElementById('pedido')?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+};
+
 // ── INLINE EDIT PRODUTO ───────────────────────────
+window._varInline = {}; // { [prodId]: variantes[] }
+
 window.editarProdInline = function(id) {
   const p = produtos.find(x=>x.id===id); if(!p) return;
   const card = document.getElementById('pcard-'+id);
   if(!card) return;
+  const isVar = p.tipo === 'variantes';
+  _varInline[id] = isVar ? JSON.parse(JSON.stringify(p.variantes||[])) : [];
+
   card.classList.add('editing-inline');
   card.innerHTML = `
     <div class="inline-edit-form" onclick="event.stopPropagation()">
       <div class="inline-edit-row">
         <div class="inline-field">
-          <label>Tamanho / título</label>
-          <input class="minput" id="ie-tam-${id}" value="${escHtml(p.tamanho)}" placeholder="Ex: 500ml">
+          <label>${isVar ? 'Nome do anúncio' : 'Subtítulo'}</label>
+          <input class="minput" id="ie-nome-${id}" value="${escHtml(p.nome||'')}" placeholder="Açaí Premium">
         </div>
         <div class="inline-field">
-          <label>Subtítulo</label>
-          <input class="minput" id="ie-nome-${id}" value="${escHtml(p.nome)}" placeholder="Açaí Premium">
+          <label>Descrição</label>
+          <input class="minput" id="ie-desc-${id}" value="${escHtml(p.descricao||'')}" placeholder="Cremoso, gelado...">
         </div>
       </div>
-      <div class="inline-field">
-        <label>Descrição</label>
-        <input class="minput" id="ie-desc-${id}" value="${escHtml(p.descricao||'')}" placeholder="Descrição chamativa...">
-      </div>
-      <div class="inline-edit-row">
-        <div class="inline-field">
-          <label>Preço normal — <s style="opacity:.6">riscado</s> (R$)</label>
-          <input class="minput" type="number" step="0.01" min="0" id="ie-pant-${id}" value="${p.precoAnt||''}" placeholder="0 = sem risco">
+
+      ${isVar ? `
+        <!-- VARIANTES INLINE -->
+        <div style="font-size:11px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin:6px 0 4px">Variantes de tamanho</div>
+        <div id="ie-var-list-${id}"></div>
+        <button class="var-add-btn" style="margin-bottom:8px" onclick="addVarInline('${id}')">+ Adicionar tamanho</button>
+      ` : `
+        <!-- SIMPLES INLINE -->
+        <div class="inline-edit-row three">
+          <div class="inline-field">
+            <label>Tamanho / título</label>
+            <input class="minput" id="ie-tam-${id}" value="${escHtml(p.tamanho||'')}" placeholder="Ex: 500ml">
+          </div>
+          <div class="inline-field">
+            <label>Preço <s style="opacity:.6">riscado</s></label>
+            <input class="minput" type="number" step="0.01" min="0" id="ie-pant-${id}" value="${p.precoAnt||''}" placeholder="0 = sem risco">
+          </div>
+          <div class="inline-field">
+            <label>Preço promocional ★</label>
+            <input class="minput" type="number" step="0.01" id="ie-preco-${id}" value="${p.preco||''}">
+          </div>
         </div>
-        <div class="inline-field">
-          <label>Preço promocional (R$) ★</label>
-          <input class="minput" type="number" step="0.01" id="ie-preco-${id}" value="${p.preco}">
-        </div>
-      </div>
+      `}
+
       <div class="inline-edit-actions">
-        <button class="ie-save" onclick="salvarProdInline('${id}')">✅ Salvar</button>
+        <button class="ie-save" onclick="salvarProdInline('${id}','${isVar?'variantes':'simples'}')">✅ Salvar</button>
         <button class="ie-cancel" onclick="renderProdutos()">Cancelar</button>
-        <button class="ie-del" onclick="confirmarDel('prod','${id}','${escHtml(p.tamanho)}')">🗑 Remover</button>
+        <button class="ie-del" onclick="confirmarDel('prod','${id}','${escHtml(p.nome||p.tamanho)}')">🗑 Remover</button>
       </div>
     </div>
   `;
-  setTimeout(()=>document.getElementById('ie-tam-'+id)?.focus(), 50);
+  if(isVar) renderVarInline(id);
+  setTimeout(()=>document.getElementById('ie-nome-'+id)?.focus(), 50);
 };
 
-window.salvarProdInline = async function(id) {
-  const tam     = document.getElementById('ie-tam-'+id)?.value.trim();
-  const nome    = document.getElementById('ie-nome-'+id)?.value.trim() || 'Açaí Premium';
-  const descricao = document.getElementById('ie-desc-'+id)?.value.trim();
-  const pAnt    = parseFloat(document.getElementById('ie-pant-'+id)?.value) || 0;
-  const preco   = parseFloat(document.getElementById('ie-preco-'+id)?.value);
-  if(!tam || isNaN(preco) || preco <= 0) { toast('Preencha tamanho e preço!','err'); return; }
+function renderVarInline(prodId) {
+  const list = document.getElementById('ie-var-list-'+prodId);
+  if(!list) return;
+  const vars = _varInline[prodId] || [];
+  list.innerHTML = '';
+  if(vars.length > 0) {
+    const header = document.createElement('div');
+    header.style.cssText = 'display:grid;grid-template-columns:1fr 90px 90px 32px;gap:6px;padding:0 2px;margin-bottom:4px';
+    header.innerHTML = `
+      <span style="font-size:10px;color:var(--muted)">Tamanho</span>
+      <span style="font-size:10px;color:var(--muted)">Riscado (R$)</span>
+      <span style="font-size:10px;color:var(--gold)">Preço atual ★</span>
+      <span></span>`;
+    list.appendChild(header);
+  }
+  vars.forEach((v, i) => {
+    const row = document.createElement('div');
+    row.className = 'var-admin-item';
+    row.innerHTML = `
+      <input placeholder="Tamanho (ex: 500ml)" value="${escHtml(v.tamanho)}"
+        oninput="_varInline['${prodId}'][${i}].tamanho=this.value">
+      <input type="number" step="0.01" min="0" placeholder="Riscado" value="${v.precoAnt||''}"
+        oninput="_varInline['${prodId}'][${i}].precoAnt=parseBRL(this.value)" style="font-size:12px">
+      <input type="number" step="0.01" min="0" placeholder="Preço" value="${v.preco||''}"
+        oninput="_varInline['${prodId}'][${i}].preco=parseBRL(this.value)">
+      <button class="var-admin-del" onclick="delVarInline('${prodId}',${i})" title="Remover">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.addVarInline = function(prodId) {
+  if(!_varInline[prodId]) _varInline[prodId] = [];
+  _varInline[prodId].push({ id:'v'+Date.now(), tamanho:'', preco:0, precoAnt:0 });
+  renderVarInline(prodId);
+  setTimeout(()=>{
+    const rows = document.querySelectorAll(`#ie-var-list-${prodId} .var-admin-item`);
+    if(rows.length) rows[rows.length-1].querySelector('input')?.focus();
+  }, 30);
+};
+
+window.salvarProdInline = async function(id, tipo) {
+  const nome     = document.getElementById('ie-nome-'+id)?.value.trim() || 'Açaí Premium';
+  const descricao= document.getElementById('ie-desc-'+id)?.value.trim() || '';
   const btn = document.querySelector(`#pcard-${id} .ie-save`);
+
+  let dados;
+  if(tipo === 'variantes') {
+    const vars = (_varInline[id]||[]).filter(v => v.tamanho.trim() && v.preco > 0);
+    if(vars.length === 0) { toast('Adicione pelo menos uma variante com tamanho e preço!','err'); return; }
+    const minPreco = Math.min(...vars.map(v=>v.preco));
+    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes:vars, preco:minPreco, tamanho:'' };
+  } else {
+    const tam  = document.getElementById('ie-tam-'+id)?.value.trim();
+    const pAnt = parseBRL(document.getElementById('ie-pant-'+id)?.value);
+    const preco= parseBRL(document.getElementById('ie-preco-'+id)?.value);
+    if(!tam || isNaN(preco) || preco <= 0) { toast('Preencha tamanho e preço!','err'); return; }
+    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco, precoAnt:pAnt, variantes:[] };
+  }
+
   if(btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
   try {
     const prod = produtos.find(x=>x.id===id);
-    if(prod){ prod.tamanho=tam; prod.nome=nome; prod.descricao=descricao; prod.preco=preco; prod.precoAnt=pAnt; }
-    await fbUpdate('produtos', id, { tamanho:tam, nome, descricao, preco, precoAnt:pAnt });
+    if(prod) Object.assign(prod, dados);
+    await fbUpdate('produtos', id, dados);
+    delete _varInline[id];
     renderProdutos();
     toast('✅ Produto salvo!', 'ok');
-  } catch(e) { toast('❌ Erro ao salvar: '+e.message,'err'); if(btn){btn.textContent='✅ Salvar';btn.disabled=false;} }
+  } catch(e) {
+    toast('❌ Erro ao salvar: '+e.message,'err');
+    if(btn){ btn.textContent='✅ Salvar'; btn.disabled=false; }
+  }
 };
 
 // ── INLINE EDIT COMPLEMENTO ───────────────────────
@@ -1272,13 +1465,106 @@ window.salvarCompInline = async function(id) {
 // helper para evitar XSS nos campos inline
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ── ADD/EDIT PRODUTO (modal — mantido para "novo produto") ─
+// aceita tanto vírgula quanto ponto como separador decimal
+function parseBRL(v){ return parseFloat(String(v).replace(',','.')) || 0; }
+window.parseBRL = parseBRL;
+
+// ── DELETE VARIANTE (precisa ser window para inline handlers) ─
+window.delVarModal = function(i) {
+  window._varModal.splice(i, 1);
+  renderVariantesModal();
+};
+window.delVarInline = function(prodId, i) {
+  if(window._varInline[prodId]) {
+    window._varInline[prodId].splice(i, 1);
+    renderVarInline(prodId);
+  }
+};
+
+// ── MOVER PRODUTOS / COMPLEMENTOS ────────────────
+window.moverProd = async function(id, dir) {
+  const idx = produtos.findIndex(p=>p.id===id);
+  const alvo = idx + dir;
+  if(alvo < 0 || alvo >= produtos.length) return;
+  [produtos[idx], produtos[alvo]] = [produtos[alvo], produtos[idx]];
+  // salvar ordem no Firebase
+  try {
+    await fbUpdate('produtos', produtos[idx].id,  { ordem: idx  });
+    await fbUpdate('produtos', produtos[alvo].id, { ordem: alvo });
+  } catch(e) { /* ignora se não tiver campo ordem */ }
+  renderProdutos();
+};
+window.moverComp = async function(id, dir) {
+  const idx = complementos.findIndex(c=>c.id===id);
+  const alvo = idx + dir;
+  if(alvo < 0 || alvo >= complementos.length) return;
+  [complementos[idx], complementos[alvo]] = [complementos[alvo], complementos[idx]];
+  try {
+    await fbUpdate('complementos', complementos[idx].id,  { ordem: idx  });
+    await fbUpdate('complementos', complementos[alvo].id, { ordem: alvo });
+  } catch(e) { /* ignora */ }
+  renderComplementos();
+};
+
+// ── ADD/EDIT PRODUTO (modal) ──────────────────────
+window._varModal = []; // variantes sendo editadas no modal
+
+function setTipoProd(tipo) {
+  document.getElementById('tipoBtnSimples').classList.toggle('active', tipo==='simples');
+  document.getElementById('tipoBtnVariantes').classList.toggle('active', tipo==='variantes');
+  document.getElementById('npCamposSimples').style.display   = tipo==='simples'   ? '' : 'none';
+  document.getElementById('npCamposVariantes').style.display = tipo==='variantes' ? '' : 'none';
+}
+window.setTipoProd = setTipoProd;
+
+function renderVariantesModal() {
+  const list = document.getElementById('npVariantesList');
+  list.innerHTML = '';
+  if(_varModal.length > 0) {
+    const header = document.createElement('div');
+    header.style.cssText = 'display:grid;grid-template-columns:1fr 90px 90px 32px;gap:6px;padding:0 2px;margin-bottom:4px';
+    header.innerHTML = `
+      <span style="font-size:10px;color:var(--muted)">Tamanho</span>
+      <span style="font-size:10px;color:var(--muted)">Riscado (R$)</span>
+      <span style="font-size:10px;color:var(--gold)">Preço atual ★</span>
+      <span></span>`;
+    list.appendChild(header);
+  }
+  _varModal.forEach((v, i) => {
+    const row = document.createElement('div');
+    row.className = 'var-admin-item';
+    row.innerHTML = `
+      <input placeholder="Tamanho (ex: 500ml)" value="${escHtml(v.tamanho)}" oninput="_varModal[${i}].tamanho=this.value">
+      <input type="number" step="0.01" min="0" placeholder="Riscado" value="${v.precoAnt||''}" oninput="_varModal[${i}].precoAnt=parseBRL(this.value)" style="font-size:12px">
+      <input type="number" step="0.01" min="0" placeholder="Preço" value="${v.preco||''}" oninput="_varModal[${i}].preco=parseBRL(this.value)">
+      <button class="var-admin-del" onclick="delVarModal(${i})" title="Remover">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.addVarianteModal = function() {
+  _varModal.push({ id: 'v'+Date.now()+Math.random(), tamanho:'', preco:0, precoAnt:0 });
+  renderVariantesModal();
+  // focus last input
+  setTimeout(()=>{
+    const inputs = document.querySelectorAll('#npVariantesList .var-admin-item input');
+    if(inputs.length) inputs[inputs.length - 4]?.focus();
+  }, 30);
+};
+
 function abrirNovoProd() {
   document.getElementById('modalProdTitle').textContent = 'Adicionar Produto';
   document.getElementById('npSaveBtn').textContent = 'Adicionar';
-  ['npTamanho','npPrecoAnt','npPreco','npDesc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('npNome').value = 'Açaí Premium';
+  document.getElementById('npDesc').value = '';
+  document.getElementById('npTamanho').value = '';
+  document.getElementById('npPrecoAnt').value = '';
+  document.getElementById('npPreco').value = '';
   document.getElementById('npEditId').value = '';
+  _varModal = [];
+  setTipoProd('simples');
+  renderVariantesModal();
   abrirModal('modNovoProd');
 }
 
@@ -1286,35 +1572,61 @@ window.abrirEditProd = function(id) {
   const p = produtos.find(x=>x.id===id); if(!p) return;
   document.getElementById('modalProdTitle').textContent = 'Editar Produto';
   document.getElementById('npSaveBtn').textContent = 'Salvar';
-  document.getElementById('npTamanho').value  = p.tamanho;
-  document.getElementById('npPrecoAnt').value = p.precoAnt;
-  document.getElementById('npPreco').value    = p.preco;
-  document.getElementById('npNome').value     = p.nome;
-  document.getElementById('npDesc').value     = p.descricao||'';
+  document.getElementById('npNome').value     = p.nome || '';
+  document.getElementById('npDesc').value     = p.descricao || '';
   document.getElementById('npEditId').value   = id;
+  const isVar = p.tipo === 'variantes';
+  if(isVar) {
+    _varModal = JSON.parse(JSON.stringify(p.variantes || []));
+    setTipoProd('variantes');
+    renderVariantesModal();
+  } else {
+    _varModal = [];
+    document.getElementById('npTamanho').value  = p.tamanho || '';
+    document.getElementById('npPrecoAnt').value = p.precoAnt || '';
+    document.getElementById('npPreco').value    = p.preco || '';
+    setTipoProd('simples');
+    renderVariantesModal();
+  }
   abrirModal('modNovoProd');
 };
 
 window.salvarProduto = async function() {
-  const tam    = document.getElementById('npTamanho').value.trim();
-  const pA     = parseFloat(document.getElementById('npPrecoAnt').value) || 0;
-  const p      = parseFloat(document.getElementById('npPreco').value);
-  const nome   = document.getElementById('npNome').value.trim() || 'Açaí Premium';
-  const descricao = document.getElementById('npDesc').value.trim();
-  const editId = document.getElementById('npEditId').value;
-  if(!tam || isNaN(p) || p<=0) { toast('Preencha tamanho e preço!','err'); return; }
-  if(editId) {
-    const prod = produtos.find(x=>x.id===editId);
-    if(prod){ prod.tamanho=tam; prod.nome=nome; prod.descricao=descricao; prod.preco=p; prod.precoAnt=pA; }
-    await fbUpdate('produtos', editId, { tamanho:tam, nome, descricao, preco:p, precoAnt:pA });
-    toast('✅ Produto atualizado!', 'ok');
+  const nome     = document.getElementById('npNome').value.trim() || 'Açaí Premium';
+  const descricao= document.getElementById('npDesc').value.trim();
+  const editId   = document.getElementById('npEditId').value;
+  const isVar    = document.getElementById('tipoBtnVariantes').classList.contains('active');
+
+  let dados;
+  if(isVar) {
+    const vars = _varModal.filter(v => v.tamanho.trim() && v.preco > 0);
+    if(vars.length === 0) { toast('Adicione pelo menos uma variante com tamanho e preço!','err'); return; }
+    // ensure all have id
+    vars.forEach(v => { if(!v.id) v.id = 'v'+Date.now()+Math.random(); });
+    const minPreco = Math.min(...vars.map(v=>v.preco));
+    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes: vars, preco: minPreco, tamanho:'' };
   } else {
-    const dados = { tamanho:tam, nome, descricao, preco:p, precoAnt:pA, esgotado:false, imgUrl:null, ordem: Date.now() };
-    const newId = await fbAdd('produtos', dados);
-    produtos.push({ id:newId, ...dados });
-    toast('✅ Produto adicionado!', 'ok');
+    const tam = document.getElementById('npTamanho').value.trim();
+    const pA  = parseBRL(document.getElementById('npPrecoAnt').value);
+    const p   = parseBRL(document.getElementById('npPreco').value);
+    if(!tam || isNaN(p) || p<=0) { toast('Preencha tamanho e preço!','err'); return; }
+    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco:p, precoAnt:pA, variantes:[] };
   }
-  fecharModal('modNovoProd'); renderProdutos();
+
+  try {
+    if(editId) {
+      const prod = produtos.find(x=>x.id===editId);
+      if(prod) Object.assign(prod, dados);
+      await fbUpdate('produtos', editId, dados);
+      toast('✅ Produto atualizado!', 'ok');
+    } else {
+      const newDados = { ...dados, esgotado:false, imgUrl:null, ordem: Date.now() };
+      const newId = await fbAdd('produtos', newDados);
+      produtos.push({ id:newId, ...newDados });
+      toast('✅ Produto adicionado!', 'ok');
+    }
+    fecharModal('modNovoProd'); renderProdutos();
+  } catch(e) { toast('❌ Erro ao salvar: '+e.message,'err'); }
 };
 
 // ── ADD/EDIT COMPLEMENTO ──────────────────────────
