@@ -170,6 +170,21 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
 .tipo-btn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:.2s;}
 .tipo-btn.active{border-color:var(--gold);background:rgba(201,162,39,.1);color:var(--gold-l);}
 
+/* ADICIONAIS DO PRODUTO (igual às variantes) */
+.adicionais-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);}
+.adicionais-section .sec-label{font-size:11px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.adicionais-section .sec-hint{font-size:11px;color:var(--muted);margin-bottom:8px;}
+/* picker de adicionais no modal do cliente */
+.adic-opt{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;cursor:pointer;transition:var(--tr);}
+.adic-opt:hover{border-color:rgba(201,162,39,.4);background:rgba(201,162,39,.05);}
+.adic-opt.selected{border-color:var(--gold);background:rgba(201,162,39,.1);}
+.adic-opt .ao-left{display:flex;align-items:center;gap:10px;}
+.adic-chk{width:18px;height:18px;border:1.5px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:.15s;}
+.adic-opt.selected .adic-chk{background:var(--gold);border-color:var(--gold);color:#000;font-weight:700;}
+.adic-nome{font-size:14px;font-weight:500;}
+.adic-preco{font-size:14px;font-weight:600;color:var(--gold-l);}
+.adic-preco-old{font-size:12px;color:var(--muted);text-decoration:line-through;margin-right:4px;}
+
 /* ADD CARDS */
 .add-card{background:rgba(201,162,39,.05);border:2px dashed rgba(201,162,39,.25);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:200px;cursor:pointer;transition:var(--tr);color:var(--muted);}
 .add-card:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,162,39,.08);}
@@ -554,14 +569,32 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
   </div>
 </div>
 
-<!-- MODAL VARIANTES (cliente escolhe tamanho) -->
+<!-- MODAL VARIANTES (cliente escolhe tamanho + complementos) -->
 <div class="moverlay" id="modVariantes">
-  <div class="mbox">
+  <div class="mbox" style="max-width:500px">
     <div class="psub" id="varProdSubtitulo" style="margin-bottom:4px"></div>
     <h3 id="varProdNome" style="margin-bottom:4px">Escolha o tamanho</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Selecione uma opção para continuar</p>
-    <div class="var-list" id="varList"></div>
-    <div class="mactions"><button class="mbtn" onclick="fecharModal('modVariantes')">Cancelar</button></div>
+
+    <!-- STEP 1: Tamanhos -->
+    <div id="varStepTamanho">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Selecione um tamanho para continuar</p>
+      <div class="var-list" id="varList"></div>
+    </div>
+
+    <!-- STEP 2: Adicionais do produto -->
+    <div id="varStepComps" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border2)">
+        <button onclick="varVoltarTamanho()" style="background:none;border:1px solid var(--border2);border-radius:8px;padding:4px 10px;font-size:12px;color:var(--muted);cursor:pointer">← Tamanho</button>
+        <span id="varTamanhoSel" style="font-size:13px;font-weight:600;color:var(--gold-l)"></span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Adicione os complementos que desejar (opcional)</p>
+      <div id="varCompsList" style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px;max-height:300px;overflow-y:auto;"></div>
+    </div>
+
+    <div class="mactions" style="margin-top:0">
+      <button class="mbtn" onclick="fecharModal('modVariantes')">Cancelar</button>
+      <button class="mbtn primary" id="varConfirmarBtn" style="display:none" onclick="confirmarVariante()">Adicionar ao pedido</button>
+    </div>
   </div>
 </div>
 
@@ -591,6 +624,13 @@ section{position:relative;z-index:1;padding:56px 20px;max-width:960px;margin:0 a
       <button class="var-add-btn" onclick="addVarianteModal()">+ Adicionar tamanho</button>
     </div>
     <input type="hidden" id="npEditId">
+    <!-- ADICIONAIS DO PRODUTO -->
+    <div class="mfield" style="margin-top:4px;padding-top:10px;border-top:1px solid var(--border2)">
+      <label style="margin-bottom:4px;display:block">Adicionais do produto <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">O cliente escolhe estes itens ao clicar no produto — morango, leite condensado, granola etc.</div>
+      <div id="npAdicList"></div>
+      <button class="var-add-btn" onclick="addNpAdic()">+ Adicionar item</button>
+    </div>
     <div class="mactions"><button class="mbtn" onclick="fecharModal('modNovoProd')">Cancelar</button><button class="mbtn primary" id="npSaveBtn" onclick="salvarProduto()">Salvar</button></div>
   </div>
 </div>
@@ -1013,6 +1053,7 @@ function calcTotal() {
   const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
   let t = precoBase;
   complementos.forEach(c => { if(compsSel.has(c.id)) t += c.preco; });
+  (prodSel.adicionaisEscolhidos||[]).forEach(a => { t += (a.preco||0); });
   t += getTaxaEntrega();
   return t;
 }
@@ -1041,6 +1082,11 @@ function atualizarPedido() {
   let total = precoBase;
   const scs = complementos.filter(c => compsSel.has(c.id));
   let html = `<div class="order-line"><div class="order-line-info"><div class="order-line-name">🍇 ${prodSel.nome} ${labelTamanho}</div><div class="order-line-price">${fmt(precoBase)}</div></div><button class="order-line-remove" onclick="removerProdPedido()">✕ Remover</button></div>`;
+  // adicionais do produto (escolhidos no picker)
+  (prodSel.adicionaisEscolhidos||[]).forEach(a => {
+    total += (a.preco||0);
+    html += `<div class="order-line" style="padding-left:16px"><div class="order-line-info"><div class="order-line-name" style="font-size:13px;color:var(--muted)">+ ${a.nome}</div><div class="order-line-price" style="font-size:13px">${a.preco>0?fmt(a.preco):'Grátis'}</div></div></div>`;
+  });
   scs.forEach(c => {
     total += c.preco;
     html += `<div class="order-line"><div class="order-line-info"><div class="order-line-name">+ ${c.nome}</div><div class="order-line-price">${fmt(c.preco)}</div></div><button class="order-line-remove" onclick="removerCompPedido('${c.id}')">✕ Remover</button></div>`;
@@ -1132,6 +1178,9 @@ window.enviarWhats = function() {
   const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
   const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
   let msg = `🍇 *Pedido Açaví*\n\n*${prodSel.nome} ${labelTamanho}* — ${fmt(precoBase)}\n`;
+  (prodSel.adicionaisEscolhidos||[]).forEach(a => {
+    msg += `  ➕ ${a.nome}${a.preco>0?' — '+fmt(a.preco):' (Grátis)'}\n`;
+  });
   if(scs.length){ msg+=`\n*Complementos:*\n`; scs.forEach(c=>{ msg+=`• ${c.nome} — ${fmt(c.preco)}\n`; }); }
   if(tipoEntrega==='entrega') {
     const taxa = getTaxaEntrega();
@@ -1243,12 +1292,24 @@ window.salvarHorario = async function() {
 };
 
 // ── VARIANT PICKER (cliente) ──────────────────────
+let _varPickerProd = null;
+let _varPickerVariante = null;
+let _varPickerAdics = new Set(); // índices de adicionais selecionados
+
 window.abrirVariantePicker = function(p) {
+  _varPickerProd = p;
+  _varPickerVariante = null;
+  _varPickerAdics = new Set();
+
   document.getElementById('varProdNome').textContent = p.titulo || p.nome || 'Escolha o tamanho';
   document.getElementById('varProdSubtitulo').textContent = p.nome || '';
+  document.getElementById('varStepTamanho').style.display = '';
+  document.getElementById('varStepComps').style.display   = 'none';
+  document.getElementById('varConfirmarBtn').style.display = 'none';
+
   const list = document.getElementById('varList');
-  const selId = (prodSel && prodSel.id===p.id && prodSel.varianteSel) ? prodSel.varianteSel.id : null;
   list.innerHTML = '';
+  const selId = (prodSel && prodSel.id===p.id && prodSel.varianteSel) ? prodSel.varianteSel.id : null;
   (p.variantes||[]).forEach(v => {
     const div = document.createElement('div');
     div.className = 'var-opt' + (selId===v.id?' selected':'');
@@ -1258,8 +1319,7 @@ window.abrirVariantePicker = function(p) {
         ${v.precoAnt && v.precoAnt > v.preco ? `<span class="var-opt-old">${fmt(v.precoAnt)}</span>` : ''}
         <span class="var-opt-preco">${fmt(v.preco)}</span>
         ${v.precoAnt && v.precoAnt > v.preco ? `<span class="disc-badge">${desc(v.precoAnt,v.preco)}</span>` : ''}
-      </div>
-    `;
+      </div>`;
     div.onclick = () => selecionarVariante(p, v);
     list.appendChild(div);
   });
@@ -1267,12 +1327,118 @@ window.abrirVariantePicker = function(p) {
 };
 
 window.selecionarVariante = function(p, v) {
-  prodSel = { ...p, varianteSel: v };
+  _varPickerVariante = v;
+  const adics = p.adicionais || [];
+
+  // Sem adicionais → confirma direto
+  if(adics.length === 0) { _confirmarVarianteComAdics(p, v, new Set()); return; }
+
+  // Mostra step 2
+  document.getElementById('varStepTamanho').style.display = 'none';
+  document.getElementById('varStepComps').style.display   = '';
+  document.getElementById('varTamanhoSel').textContent    = `${v.tamanho} — ${fmt(v.preco)}`;
+  document.getElementById('varConfirmarBtn').style.display = '';
+
+  const grid = document.getElementById('varCompsList');
+  grid.innerHTML = '';
+  adics.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.className = 'adic-opt';
+    row.id = 'adic-opt-'+i;
+    row.innerHTML = `
+      <div class="ao-left">
+        <div class="adic-chk"></div>
+        <span class="adic-nome">${escHtml(a.nome)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        ${a.precoAnt && a.precoAnt > a.preco ? `<span class="adic-preco-old">${fmt(a.precoAnt)}</span>` : ''}
+        <span class="adic-preco">${a.preco > 0 ? '+'+fmt(a.preco) : 'Grátis'}</span>
+      </div>`;
+    row.onclick = () => {
+      if(_varPickerAdics.has(i)) {
+        _varPickerAdics.delete(i);
+        row.classList.remove('selected');
+        row.querySelector('.adic-chk').textContent = '';
+      } else {
+        _varPickerAdics.add(i);
+        row.classList.add('selected');
+        row.querySelector('.adic-chk').textContent = '✓';
+      }
+    };
+    grid.appendChild(row);
+  });
+};
+
+window.varVoltarTamanho = function() {
+  _varPickerVariante = null;
+  _varPickerAdics = new Set();
+  document.getElementById('varStepTamanho').style.display = '';
+  document.getElementById('varStepComps').style.display   = 'none';
+  document.getElementById('varConfirmarBtn').style.display = 'none';
+};
+
+window.confirmarVariante = function() {
+  if(!_varPickerProd || !_varPickerVariante) return;
+  _confirmarVarianteComAdics(_varPickerProd, _varPickerVariante, _varPickerAdics);
+};
+
+function _confirmarVarianteComAdics(p, v, adicsSet) {
+  const adicsEscolhidos = [...adicsSet].map(i => p.adicionais[i]).filter(Boolean);
+  prodSel = { ...p, varianteSel: v, adicionaisEscolhidos: adicsEscolhidos };
   fecharModal('modVariantes');
   renderProdutos();
   atualizarPedido();
   document.getElementById('pedido')?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── ADICIONAIS DO PRODUTO (inline edit) ──────────
+window._adicInline = {}; // { [prodId]: adicional[] }
+
+window.delAdicInline = function(prodId, i) {
+  if(window._adicInline[prodId]) {
+    window._adicInline[prodId].splice(i, 1);
+    renderAdicInline(prodId);
+  }
 };
+window.addAdicInline = function(prodId) {
+  if(!window._adicInline[prodId]) window._adicInline[prodId] = [];
+  window._adicInline[prodId].push({ nome:'', preco:0, precoAnt:0 });
+  renderAdicInline(prodId);
+  setTimeout(()=>{
+    const rows = document.querySelectorAll(`#ie-adic-list-${prodId} .var-admin-item`);
+    if(rows.length) rows[rows.length-1].querySelector('input')?.focus();
+  }, 30);
+};
+
+function renderAdicInline(prodId) {
+  const list = document.getElementById('ie-adic-list-'+prodId);
+  if(!list) return;
+  const adics = window._adicInline[prodId] || [];
+  list.innerHTML = '';
+  if(adics.length > 0) {
+    const header = document.createElement('div');
+    header.style.cssText = 'display:grid;grid-template-columns:1fr 90px 90px 32px;gap:6px;padding:0 2px;margin-bottom:4px';
+    header.innerHTML = `
+      <span style="font-size:10px;color:var(--muted)">Nome do adicional</span>
+      <span style="font-size:10px;color:var(--muted)">Riscado (R$)</span>
+      <span style="font-size:10px;color:var(--gold)">Preço atual ★</span>
+      <span></span>`;
+    list.appendChild(header);
+  }
+  adics.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.className = 'var-admin-item';
+    row.innerHTML = `
+      <input placeholder="Ex: Leite condensado" value="${escHtml(a.nome)}"
+        oninput="_adicInline['${prodId}'][${i}].nome=this.value">
+      <input type="number" step="0.01" min="0" placeholder="0=grátis" value="${a.precoAnt||''}"
+        oninput="_adicInline['${prodId}'][${i}].precoAnt=parseBRL(this.value)" style="font-size:12px">
+      <input type="number" step="0.01" min="0" placeholder="Preço" value="${a.preco||''}"
+        oninput="_adicInline['${prodId}'][${i}].preco=parseBRL(this.value)">
+      <button class="var-admin-del" onclick="delAdicInline('${prodId}',${i})" title="Remover">✕</button>`;
+    list.appendChild(row);
+  });
+}
 
 // ── INLINE EDIT PRODUTO ───────────────────────────
 window._varInline = {}; // { [prodId]: variantes[] }
@@ -1288,6 +1454,7 @@ window.editarProdInline = function(id) {
   window._varInline[id]  = tipoAtual === 'variantes'
     ? JSON.parse(JSON.stringify(p.variantes || []))
     : [];
+  window._adicInline[id] = JSON.parse(JSON.stringify(p.adicionais || []));
 
   card.classList.add('editing-inline');
   card.innerHTML = `
@@ -1318,6 +1485,14 @@ window.editarProdInline = function(id) {
 
       <div id="ie-campos-${id}"></div>
 
+      <!-- ADICIONAIS DO PRODUTO -->
+      <div class="adicionais-section">
+        <div class="sec-label">Adicionais do anúncio</div>
+        <div class="sec-hint">O cliente vai poder escolher estes itens ao clicar neste produto (morango, leite condensado, granola etc.)</div>
+        <div id="ie-adic-list-${id}"></div>
+        <button class="var-add-btn" onclick="addAdicInline('${id}')">+ Adicionar item</button>
+      </div>
+
       <div class="inline-edit-actions">
         <button class="ie-save" id="ie-save-${id}" onclick="salvarProdInline('${id}')">✅ Salvar</button>
         <button class="ie-cancel" onclick="renderProdutos()">Cancelar</button>
@@ -1327,6 +1502,7 @@ window.editarProdInline = function(id) {
   `;
 
   renderCamposInline(id, p);
+  renderAdicInline(id);
   setTimeout(()=>document.getElementById('ie-nome-'+id)?.focus(), 50);
 };
 
@@ -1447,10 +1623,13 @@ window.salvarProdInline = async function(id) {
   if(btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
   try {
     const prod = produtos.find(x=>x.id===id);
+    const adicionais = (window._adicInline[id]||[]).filter(a => a.nome.trim());
+    dados.adicionais = adicionais;
     if(prod) Object.assign(prod, dados);
     await fbUpdate('produtos', id, dados);
     delete window._varInline[id];
     delete window._tipoInline[id];
+    delete window._adicInline[id];
     renderProdutos();
     toast('✅ Produto salvo!', 'ok');
   } catch(e) {
@@ -1559,6 +1738,39 @@ window.moverComp = async function(id, dir) {
   renderComplementos();
 };
 
+window._npAdicionais = [];
+
+function renderNpAdicList() {
+  const list = document.getElementById('npAdicList'); if(!list) return;
+  const adics = window._npAdicionais;
+  list.innerHTML = '';
+  if(adics.length > 0) {
+    const h = document.createElement('div');
+    h.style.cssText = 'display:grid;grid-template-columns:1fr 90px 90px 32px;gap:6px;padding:0 2px;margin-bottom:4px';
+    h.innerHTML = `<span style="font-size:10px;color:var(--muted)">Nome do adicional</span><span style="font-size:10px;color:var(--muted)">Riscado (R$)</span><span style="font-size:10px;color:var(--gold)">Preço atual ★</span><span></span>`;
+    list.appendChild(h);
+  }
+  adics.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.className = 'var-admin-item';
+    row.innerHTML = `
+      <input placeholder="Ex: Morango" value="${escHtml(a.nome)}" oninput="_npAdicionais[${i}].nome=this.value">
+      <input type="number" step="0.01" min="0" placeholder="0=grátis" value="${a.precoAnt||''}" oninput="_npAdicionais[${i}].precoAnt=parseBRL(this.value)" style="font-size:12px">
+      <input type="number" step="0.01" min="0" placeholder="Preço" value="${a.preco||''}" oninput="_npAdicionais[${i}].preco=parseBRL(this.value)">
+      <button class="var-admin-del" onclick="delNpAdic(${i})" title="Remover">✕</button>`;
+    list.appendChild(row);
+  });
+}
+window.delNpAdic = function(i) { window._npAdicionais.splice(i,1); renderNpAdicList(); };
+window.addNpAdic = function() {
+  window._npAdicionais.push({ nome:'', preco:0, precoAnt:0 });
+  renderNpAdicList();
+  setTimeout(()=>{
+    const rows = document.querySelectorAll('#npAdicList .var-admin-item');
+    if(rows.length) rows[rows.length-1].querySelector('input')?.focus();
+  }, 30);
+};
+
 // ── ADD/EDIT PRODUTO (modal) ──────────────────────
 window._varModal = []; // variantes sendo editadas no modal
 
@@ -1615,9 +1827,11 @@ function abrirNovoProd() {
   document.getElementById('npPrecoAnt').value = '';
   document.getElementById('npPreco').value = '';
   document.getElementById('npEditId').value = '';
-  _varModal = [];
+  window._npAdicionais = [];
+  window._varModal = [];
   setTipoProd('simples');
   renderVariantesModal();
+  renderNpAdicList();
   abrirModal('modNovoProd');
 }
 
@@ -1629,18 +1843,20 @@ window.abrirEditProd = function(id) {
   document.getElementById('npDesc').value     = p.descricao || '';
   document.getElementById('npEditId').value   = id;
   const isVar = p.tipo === 'variantes';
+  window._npAdicionais = JSON.parse(JSON.stringify(p.adicionais || []));
   if(isVar) {
-    _varModal = JSON.parse(JSON.stringify(p.variantes || []));
+    window._varModal = JSON.parse(JSON.stringify(p.variantes || []));
     setTipoProd('variantes');
     renderVariantesModal();
   } else {
-    _varModal = [];
+    window._varModal = [];
     document.getElementById('npTamanho').value  = p.tamanho || '';
     document.getElementById('npPrecoAnt').value = p.precoAnt || '';
     document.getElementById('npPreco').value    = p.preco || '';
     setTipoProd('simples');
     renderVariantesModal();
   }
+  renderNpAdicList();
   abrirModal('modNovoProd');
 };
 
@@ -1649,21 +1865,21 @@ window.salvarProduto = async function() {
   const descricao= document.getElementById('npDesc').value.trim();
   const editId   = document.getElementById('npEditId').value;
   const isVar    = document.getElementById('tipoBtnVariantes').classList.contains('active');
+  const adicionais = (window._npAdicionais||[]).filter(a => a.nome.trim());
 
   let dados;
   if(isVar) {
-    const vars = _varModal.filter(v => v.tamanho.trim() && v.preco > 0);
+    const vars = window._varModal.filter(v => v.tamanho.trim() && v.preco > 0);
     if(vars.length === 0) { toast('Adicione pelo menos uma variante com tamanho e preço!','err'); return; }
-    // ensure all have id
     vars.forEach(v => { if(!v.id) v.id = 'v'+Date.now()+Math.random(); });
     const minPreco = Math.min(...vars.map(v=>v.preco));
-    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes: vars, preco: minPreco, tamanho:'' };
+    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes:vars, preco:minPreco, tamanho:'', adicionais };
   } else {
     const tam = document.getElementById('npTamanho').value.trim();
     const pA  = parseBRL(document.getElementById('npPrecoAnt').value);
     const p   = parseBRL(document.getElementById('npPreco').value);
     if(!tam || isNaN(p) || p<=0) { toast('Preencha tamanho e preço!','err'); return; }
-    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco:p, precoAnt:pA, variantes:[] };
+    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco:p, precoAnt:pA, variantes:[], adicionais };
   }
 
   try {
