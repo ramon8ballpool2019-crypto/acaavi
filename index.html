@@ -317,6 +317,52 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 .footer-horario-tag{font-size:12px;color:var(--green);font-weight:500;}
 
 /* FLOAT */
+/* ═══ CUPOM ═══ */
+.cupom-row{display:flex;gap:8px;}
+.cupom-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:12px;padding:11px 14px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;outline:none;letter-spacing:1.5px;font-weight:600;transition:.2s;}
+.cupom-input:focus{border-color:rgba(240,180,41,.4);}
+.cupom-btn{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#000;border:none;border-radius:12px;padding:11px 18px;font-size:13px;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:pointer;white-space:nowrap;transition:.2s;}
+.cupom-btn:hover{filter:brightness(1.1);}
+.cupom-status{display:flex;align-items:center;justify-content:space-between;border-radius:10px;padding:9px 14px;margin-top:8px;font-size:13px;font-weight:500;}
+.cupom-status.ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:#6ee7b7;}
+.cupom-status.err{background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);color:#fda4af;}
+.cupom-remove{background:none;border:none;color:inherit;opacity:.7;cursor:pointer;font-size:14px;padding:0 4px;}
+.cupom-remove:hover{opacity:1;}
+/* admin cupons */
+.cupom-admin-item{display:grid;grid-template-columns:1fr auto auto 32px;gap:8px;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+.cupom-admin-code{font-size:14px;font-weight:700;letter-spacing:1.5px;color:var(--gold-l);}
+.cupom-admin-val{font-size:13px;color:var(--text);}
+.cupom-admin-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.5px;}
+.cupom-admin-badge.on{background:rgba(16,185,129,.12);color:#6ee7b7;border:1px solid rgba(16,185,129,.25);}
+.cupom-admin-badge.off{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border2);}
+
+/* ═══ LIMITE COMPLEMENTOS ═══ */
+.comp-limit-bar{display:none;align-items:center;justify-content:space-between;background:rgba(240,180,41,.06);border:1px solid rgba(240,180,41,.15);border-radius:12px;padding:10px 16px;margin-bottom:14px;gap:10px;}
+.comp-limit-bar.show{display:flex;}
+.comp-limit-text{font-size:13px;color:rgba(240,180,41,.8);font-weight:500;}
+.comp-limit-counter{font-size:13px;font-weight:700;color:var(--gold-l);white-space:nowrap;}
+.comp-limit-fill{height:4px;border-radius:4px;background:rgba(255,255,255,.08);flex:1;min-width:60px;overflow:hidden;}
+.comp-limit-fill-inner{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-l));border-radius:4px;transition:width .3s ease;}
+.comp-limit-fill-inner.full{background:linear-gradient(90deg,var(--red),#f87171);}
+.ccard.limit-reached{opacity:.38;pointer-events:none;}
+.ccard.limit-reached:not(.selected){filter:grayscale(.5);}
+
+/* ═══ PROMO BANNER ═══ */
+.promo-banner{width:100%;padding:11px 44px 11px 20px;text-align:center;font-size:13px;font-weight:600;position:relative;z-index:10;display:none;line-height:1.5;letter-spacing:.2px;transition:all .3s;}
+.promo-banner.show{display:block;}
+.promo-banner.style-gold{background:linear-gradient(90deg,#1a1000,#2a1900,#1a1000);border-bottom:1px solid rgba(240,180,41,.25);color:var(--gold-l);}
+.promo-banner.style-purple{background:linear-gradient(90deg,#0e0820,#160d30,#0e0820);border-bottom:1px solid rgba(139,92,246,.25);color:var(--purple-l);}
+.promo-banner.style-green{background:linear-gradient(90deg,#001a10,#002a18,#001a10);border-bottom:1px solid rgba(16,185,129,.25);color:#6ee7b7;}
+.promo-banner.style-red{background:linear-gradient(90deg,#1a0010,#2a0018,#1a0010);border-bottom:1px solid rgba(244,63,94,.25);color:#fda4af;}
+.promo-banner.style-white{background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.1);color:#f0ecff;}
+.promo-close{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:inherit;opacity:.5;cursor:pointer;font-size:16px;padding:4px;line-height:1;transition:.2s;}
+.promo-close:hover{opacity:1;}
+/* admin banner editor */
+.banner-style-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.banner-style-btn{flex:1;min-width:60px;padding:8px 6px;border-radius:10px;border:1px solid var(--border2);background:transparent;font-size:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:.15s;text-align:center;}
+.banner-style-btn.sel{border-color:var(--gold);background:rgba(240,180,41,.1);}
+.banner-preview{border-radius:10px;padding:12px 16px;text-align:center;font-size:13px;font-weight:600;margin-top:10px;transition:.3s;}
+
 /* ═══ STATUS BANNER ═══ */
 .status-banner{display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 20px;font-size:13px;font-weight:600;letter-spacing:.3px;border-bottom:1px solid transparent;position:relative;z-index:1;transition:.4s;}
 .status-banner.open{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.15);color:#6ee7b7;}
@@ -402,12 +448,19 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 <div class="toast" id="toast"></div>
 
 <!-- ADMIN BAR -->
+<div class="promo-banner" id="promoBanner">
+  <span id="promoBannerText"></span>
+  <button class="promo-close" id="promoBannerClose" onclick="fecharPromoBanner()" title="Fechar">✕</button>
+</div>
+
 <div class="admin-bar" id="adminBar">
   <span class="admin-bar-title">✏️ Modo Edição</span>
   <div class="admin-btns">
     <button class="abtn" onclick="abrirModalPix()">💳 Chave PIX</button>
     <button class="abtn" onclick="abrirModalHorario()">🕐 Horário</button>
     <button class="abtn" onclick="abrirModalZonas()">🛵 Zonas</button>
+    <button class="abtn" onclick="abrirModalBanner()">🎉 Banner</button>
+    <button class="abtn" onclick="abrirModalCupons()">🏷️ Cupons</button>
     <button class="abtn save" onclick="sairAdmin()">✅ Salvar & Sair</button>
   </div>
 </div>
@@ -472,6 +525,13 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
       <div class="sec-sub">Personalize do seu jeito</div>
     </div>
   </div>
+  <!-- barra de limite de complementos -->
+  <div class="comp-limit-bar" id="compLimitBar">
+    <span class="comp-limit-text" id="compLimitText">Escolha até <strong id="compLimitMax">?</strong> complementos</span>
+    <div class="comp-limit-fill"><div class="comp-limit-fill-inner" id="compLimitFill" style="width:0%"></div></div>
+    <span class="comp-limit-counter"><span id="compLimitCurrent">0</span>/<span id="compLimitMaxB">?</span></span>
+  </div>
+
   <div class="comps-grid" id="compGrid"></div>
 </section>
 
@@ -497,6 +557,18 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
       </div>
     </div>
     <textarea class="obs-area" id="obsArea" rows="2" placeholder="Endereço de entrega, observações..." style="display:none"></textarea>
+
+    <!-- CUPOM -->
+    <div id="cupomWrap" style="display:none;margin-top:12px">
+      <div class="cupom-row" id="cupomRow">
+        <input class="cupom-input" id="cupomInput" placeholder="Tem cupom? Digite aqui" maxlength="20"
+          oninput="this.value=this.value.toUpperCase()"
+          onkeydown="if(event.key==='Enter')aplicarCupom()">
+        <button class="cupom-btn" onclick="aplicarCupom()">Aplicar</button>
+      </div>
+      <div class="cupom-status" id="cupomStatus" style="display:none"></div>
+    </div>
+
     <div class="payment-btns">
       <button class="btn-pix" id="btnPagar" onclick="abrirConfirmacaoPedido('pix')" disabled>💳 Pagar via PIX</button>
       <div class="payment-divider">ou</div>
@@ -711,6 +783,77 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
   </div>
 </div>
 
+<!-- MODAL CUPONS -->
+<div class="moverlay" id="modCupons">
+  <div class="mbox">
+    <h3>🏷️ Cupons de Desconto</h3>
+    <div id="cuponsAdminList" style="max-height:240px;overflow-y:auto;margin-bottom:14px"></div>
+    <div style="border-top:1px solid var(--border2);padding-top:14px">
+      <p style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Novo cupom</p>
+      <div class="mrow">
+        <div class="mfield"><label>Código</label><input class="minput" id="ncCodigo" placeholder="ACAIVI10" oninput="this.value=this.value.toUpperCase()" style="letter-spacing:2px;font-weight:700"></div>
+        <div class="mfield"><label>Tipo</label>
+          <select class="minput" id="ncTipo" style="cursor:pointer">
+            <option value="percent">% Porcentagem</option>
+            <option value="fixed">R$ Valor fixo</option>
+          </select>
+        </div>
+      </div>
+      <div class="mrow">
+        <div class="mfield"><label>Valor do desconto</label><input class="minput" type="number" step="0.01" min="0" id="ncValor" placeholder="Ex: 10"></div>
+        <div class="mfield"><label>Pedido mínimo (R$)</label><input class="minput" type="number" step="0.01" min="0" id="ncMinimo" placeholder="0 = sem mínimo"></div>
+      </div>
+      <div class="mfield" style="margin-bottom:0">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text)">
+          <input type="checkbox" id="ncAtivo" checked style="width:16px;height:16px;accent-color:var(--gold)">
+          Cupom ativo (disponível para uso)
+        </label>
+      </div>
+    </div>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modCupons')">Fechar</button>
+      <button class="mbtn primary" onclick="adicionarCupom()">+ Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BANNER PROMOÇÃO -->
+<div class="moverlay" id="modBanner">
+  <div class="mbox">
+    <h3>🎉 Banner de Promoção</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Aparece no topo do site para todos os clientes.</p>
+    <div class="mfield">
+      <label style="display:flex;align-items:center;justify-content:space-between;cursor:pointer">
+        <span>Ativar banner</span>
+        <input type="checkbox" id="bannerAtivo" style="width:18px;height:18px;accent-color:var(--gold)">
+      </label>
+    </div>
+    <div class="mfield">
+      <label>Texto do banner</label>
+      <input class="minput" id="bannerTexto" placeholder="🎉 Frete grátis hoje! Peça agora!" oninput="previewBanner()">
+    </div>
+    <div class="mfield">
+      <label style="margin-bottom:8px;display:block">Cor do banner</label>
+      <div class="banner-style-row" id="bannerStyleRow">
+        <button class="banner-style-btn" data-style="gold"   onclick="selBannerStyle('gold')"   style="color:#ffe082">🟡 Dourado</button>
+        <button class="banner-style-btn" data-style="purple" onclick="selBannerStyle('purple')" style="color:#c4b5fd">🟣 Roxo</button>
+        <button class="banner-style-btn" data-style="green"  onclick="selBannerStyle('green')"  style="color:#6ee7b7">🟢 Verde</button>
+        <button class="banner-style-btn" data-style="red"    onclick="selBannerStyle('red')"    style="color:#fda4af">🔴 Vermelho</button>
+        <button class="banner-style-btn" data-style="white"  onclick="selBannerStyle('white')"  style="color:#f0ecff">⚪ Neutro</button>
+      </div>
+    </div>
+    <div class="mfield">
+      <label style="margin-bottom:6px;display:block">Pré-visualização</label>
+      <div class="banner-preview style-gold" id="bannerPreview">Digite o texto acima...</div>
+    </div>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modBanner')">Cancelar</button>
+      <button class="mbtn danger" onclick="removerBanner()">Remover</button>
+      <button class="mbtn primary" onclick="salvarBanner()">✅ Publicar</button>
+    </div>
+  </div>
+</div>
+
 <div class="moverlay" id="modNovoProd">
   <div class="mbox">
     <h3 id="modalProdTitle">Adicionar Produto</h3>
@@ -737,6 +880,10 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
       <button class="var-add-btn" onclick="addVarianteModal()">+ Adicionar tamanho</button>
     </div>
     <input type="hidden" id="npEditId">
+    <div class="mfield">
+      <label>Limite de complementos <span style="color:var(--muted);font-weight:400">(0 = sem limite)</span></label>
+      <input class="minput" type="number" min="0" max="20" id="npMaxComp" placeholder="Ex: 3" value="0">
+    </div>
     <!-- ADICIONAIS DO PRODUTO -->
     <div class="mfield" style="margin-top:4px;padding-top:10px;border-top:1px solid var(--border2)">
       <label style="margin-bottom:4px;display:block">Adicionais do produto <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
@@ -845,7 +992,7 @@ let prodSel     = null;
 let compsSel    = new Set();
 let produtos    = [];
 let complementos= [];
-let cfg         = { pixChave: '31997892312', horario: null, zonas: [
+let cfg         = { pixChave: '31997892312', horario: null, banner: null, zonas: [
   { id:'z1', nome:'Vespasiano', taxa:6.99 },
   { id:'z2', nome:'Santa Luzia', taxa:8.99 },
   { id:'z3', nome:'Contagem', taxa:10.99 },
@@ -984,6 +1131,8 @@ function renderProdutos() {
         <div class="psize">${isVar ? (p.titulo||p.nome) : p.tamanho}</div>
         <div class="pdesc">${p.descricao||''}</div>
         ${priceHtml}
+        ${!isVar && p.maxComplementos > 0 ? `<div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.5px">Até ${p.maxComplementos} complemento${p.maxComplementos>1?'s':''}</div>` : ''}
+        ${isVar && p.maxComplementos > 0 ? `<div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.5px">Até ${p.maxComplementos} complemento${p.maxComplementos>1?'s':''}</div>` : ''}
       </div>
       <div class="pimg-wrap" id="pimgwrap-${p.id}">
         ${p.imgUrl ? `<img src="${p.imgUrl}" alt="${p.nome}">` : `<div class="pimg-ph">🍇</div>`}
@@ -1103,12 +1252,70 @@ window.uploadCompImg = async function(e, id) {
 
 // ── SELEÇÃO ───────────────────────────────────────
 function selecionarProd(p) {
+  const mudou = !prodSel || prodSel.id !== p.id;
   prodSel = (prodSel && prodSel.id===p.id) ? null : p;
-  renderProdutos(); atualizarPedido();
+  if(mudou) { compsSel.clear(); } // limpa complementos ao trocar produto
+  renderProdutos(); renderLimitBar(); atualizarPedido();
 }
+function getLimiteComps() {
+  if(!prodSel) return 0;
+  return prodSel.maxComplementos > 0 ? prodSel.maxComplementos : 0;
+}
+
+function renderLimitBar() {
+  const bar     = document.getElementById('compLimitBar');
+  const txtMax  = document.getElementById('compLimitMax');
+  const numCur  = document.getElementById('compLimitCurrent');
+  const numMax  = document.getElementById('compLimitMaxB');
+  const fill    = document.getElementById('compLimitFill');
+  if(!bar) return;
+  const lim = getLimiteComps();
+  if(!lim || modoAdmin) { bar.className = 'comp-limit-bar'; return; }
+  const sel = compsSel.size;
+  const pct = Math.min(100, (sel / lim) * 100);
+  bar.className = 'comp-limit-bar show';
+  if(txtMax)  txtMax.textContent  = lim;
+  if(numCur)  numCur.textContent  = sel;
+  if(numMax)  numMax.textContent  = lim;
+  if(fill) {
+    fill.style.width = pct + '%';
+    fill.className   = 'comp-limit-fill-inner' + (sel >= lim ? ' full' : '');
+  }
+  // aplicar estado visual nos cards
+  const atingido = sel >= lim;
+  complementos.forEach(c => {
+    const card = document.getElementById('ccard-'+c.id);
+    if(!card) return;
+    if(atingido && !compsSel.has(c.id)) card.classList.add('limit-reached');
+    else card.classList.remove('limit-reached');
+  });
+}
+
 function toggleComp(c) {
-  if(compsSel.has(c.id)) compsSel.delete(c.id); else compsSel.add(c.id);
-  renderComplementos(); atualizarPedido();
+  const lim = getLimiteComps();
+  if(!compsSel.has(c.id)) {
+    // tentar adicionar
+    if(lim > 0 && compsSel.size >= lim) {
+      // animar o card de limite
+      const bar = document.getElementById('compLimitBar');
+      if(bar) {
+        bar.style.borderColor = 'rgba(244,63,94,.5)';
+        bar.style.background  = 'rgba(244,63,94,.08)';
+        setTimeout(() => {
+          bar.style.borderColor = '';
+          bar.style.background  = '';
+        }, 600);
+      }
+      toast(`Limite de ${lim} complemento${lim>1?'s':''} atingido`, 'err');
+      return;
+    }
+    compsSel.add(c.id);
+  } else {
+    compsSel.delete(c.id);
+  }
+  renderComplementos();
+  renderLimitBar();
+  atualizarPedido();
 }
 window.removerProdPedido = () => { prodSel=null; renderProdutos(); atualizarPedido(); };
 window.removerCompPedido = id => { compsSel.delete(id); renderComplementos(); atualizarPedido(); };
@@ -1168,7 +1375,8 @@ function calcTotal() {
   complementos.forEach(c => { if(compsSel.has(c.id)) t += c.preco; });
   (prodSel.adicionaisEscolhidos||[]).forEach(a => { t += (a.preco||0); });
   t += getTaxaEntrega();
-  return t;
+  t -= calcDesconto(t);
+  return Math.max(0, t);
 }
 function contarItens() {
   if(!prodSel) return 0;
@@ -1191,6 +1399,7 @@ function atualizarPedido() {
     lines.innerHTML = '<div class="order-empty">Nenhum item selecionado ainda.<br>Escolha um tamanho acima! 🍇</div>';
     btnP.disabled = btnC.disabled = true;
     delt.style.display = obs.style.display = 'none';
+    const cw = document.getElementById('cupomWrap'); if(cw) cw.style.display='none';
     flt.classList.remove('show'); pixS.classList.remove('open'); return;
   }
 
@@ -1215,8 +1424,17 @@ function atualizarPedido() {
     total += taxa;
     html+=`<div class="order-line"><div class="order-line-info"><div class="order-line-name">🛵 Entrega — ${nomeZona}</div><div class="order-line-price">${fmt(taxa)}</div></div></div>`;
   }
+  // desconto do cupom
+  const desconto = calcDesconto(total);
+  if(desconto > 0) {
+    html += `<div class="order-line" style="color:#6ee7b7"><div class="order-line-info"><div class="order-line-name">🏷️ Cupom <strong>${cupomAtivo.codigo}</strong></div><div class="order-line-price" style="color:#6ee7b7">−${fmt(desconto)}</div></div></div>`;
+    total -= desconto;
+  }
   html += `<div class="order-total"><span>Total</span><span>${fmt(total)}</span></div>`;
   lines.innerHTML = html;
+  // mostrar campo de cupom
+  const cupomWrap = document.getElementById('cupomWrap');
+  if(cupomWrap) cupomWrap.style.display = 'block';
   const lojaAberta = estaAberto();
   btnP.disabled = btnC.disabled = !lojaAberta;
   if(!lojaAberta) {
@@ -1315,6 +1533,10 @@ window.enviarWhats = function() {
     const taxa = getTaxaEntrega();
     const zona = cfg.zonas.find(z=>z.id===zonaSelId);
     msg+=`\n🛵 Entrega${zona?' — '+zona.nome:''}: ${fmt(taxa)}\n`;
+  }
+  if(cupomAtivo) {
+    const desconto = calcDesconto(total + calcDesconto(total));
+    msg+=`\n🏷️ Cupom *${cupomAtivo.codigo}*: −${fmt(desconto)}\n`;
   }
   msg+=`\n💳 *Total pago via PIX: ${fmt(total)}*`;
   msg+=`\n📋 *Tipo:* ${tipoEntrega==='entrega'?'Delivery':'Retirada no local'}`;
@@ -1640,6 +1862,7 @@ function _confirmarVarianteComAdics(p, v, adicsSet) {
   prodSel = { ...p, varianteSel: v, adicionaisEscolhidos: adicsEscolhidos };
   fecharModal('modVariantes');
   renderProdutos();
+  renderLimitBar();
   atualizarPedido();
   document.getElementById('pedido')?.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
@@ -1722,6 +1945,11 @@ window.editarProdInline = function(id) {
           <label>Descrição</label>
           <input class="minput" id="ie-desc-${id}" value="${escHtml(p.descricao||'')}" placeholder="Cremoso, gelado...">
         </div>
+      </div>
+
+      <div class="inline-field" style="max-width:200px">
+        <label>Limite de complementos <span style="color:var(--muted);font-weight:400">(0 = sem limite)</span></label>
+        <input class="minput" type="number" min="0" max="20" id="ie-maxcomp-${id}" value="${p.maxComplementos||0}" placeholder="0 = ilimitado">
       </div>
 
       <div class="inline-field" style="margin-bottom:2px">
@@ -1854,9 +2082,10 @@ window.addVarInline = function(prodId) {
 };
 
 window.salvarProdInline = async function(id) {
-  const nome     = document.getElementById('ie-nome-'+id)?.value.trim() || 'Açaí Premium';
-  const descricao= document.getElementById('ie-desc-'+id)?.value.trim() || '';
-  const tipo     = window._tipoInline[id] || 'simples';
+  const nome      = document.getElementById('ie-nome-'+id)?.value.trim() || 'Açaí Premium';
+  const descricao = document.getElementById('ie-desc-'+id)?.value.trim() || '';
+  const maxComp   = parseInt(document.getElementById('ie-maxcomp-'+id)?.value) || 0;
+  const tipo      = window._tipoInline[id] || 'simples';
   const btn      = document.getElementById('ie-save-'+id);
 
   let dados;
@@ -1864,13 +2093,13 @@ window.salvarProdInline = async function(id) {
     const vars = (window._varInline[id]||[]).filter(v => v.tamanho.trim() && v.preco > 0);
     if(vars.length === 0) { toast('Adicione pelo menos uma variante com tamanho e preço!','err'); return; }
     const minPreco = Math.min(...vars.map(v=>v.preco));
-    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes:vars, preco:minPreco, tamanho:'' };
+    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes:vars, preco:minPreco, tamanho:'', maxComplementos:maxComp };
   } else {
     const tam  = document.getElementById('ie-tam-'+id)?.value.trim();
     const pAnt = parseBRL(document.getElementById('ie-pant-'+id)?.value);
     const preco= parseBRL(document.getElementById('ie-preco-'+id)?.value);
     if(!tam || isNaN(preco) || preco <= 0) { toast('Preencha tamanho e preço!','err'); return; }
-    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco, precoAnt:pAnt, variantes:[] };
+    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco, precoAnt:pAnt, variantes:[], maxComplementos:maxComp };
   }
 
   if(btn) { btn.textContent = 'Salvando...'; btn.disabled = true; }
@@ -2079,7 +2308,8 @@ function abrirNovoProd() {
   document.getElementById('npTamanho').value = '';
   document.getElementById('npPrecoAnt').value = '';
   document.getElementById('npPreco').value = '';
-  document.getElementById('npEditId').value = '';
+  document.getElementById('npEditId').value  = '';
+  document.getElementById('npMaxComp').value = '0';
   window._npAdicionais = [];
   window._varModal = [];
   setTipoProd('simples');
@@ -2097,6 +2327,7 @@ window.abrirEditProd = function(id) {
   document.getElementById('npEditId').value   = id;
   const isVar = p.tipo === 'variantes';
   window._npAdicionais = JSON.parse(JSON.stringify(p.adicionais || []));
+  document.getElementById('npMaxComp').value = p.maxComplementos || 0;
   if(isVar) {
     window._varModal = JSON.parse(JSON.stringify(p.variantes || []));
     setTipoProd('variantes');
@@ -2118,7 +2349,8 @@ window.salvarProduto = async function() {
   const descricao= document.getElementById('npDesc').value.trim();
   const editId   = document.getElementById('npEditId').value;
   const isVar    = document.getElementById('tipoBtnVariantes').classList.contains('active');
-  const adicionais = (window._npAdicionais||[]).filter(a => a.nome.trim());
+  const adicionais   = (window._npAdicionais||[]).filter(a => a.nome.trim());
+  const maxComp      = parseInt(document.getElementById('npMaxComp')?.value) || 0;
 
   let dados;
   if(isVar) {
@@ -2126,13 +2358,13 @@ window.salvarProduto = async function() {
     if(vars.length === 0) { toast('Adicione pelo menos uma variante com tamanho e preço!','err'); return; }
     vars.forEach(v => { if(!v.id) v.id = 'v'+Date.now()+Math.random(); });
     const minPreco = Math.min(...vars.map(v=>v.preco));
-    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes:vars, preco:minPreco, tamanho:'', adicionais };
+    dados = { tipo:'variantes', nome, titulo:nome, descricao, variantes:vars, preco:minPreco, tamanho:'', adicionais, maxComplementos:maxComp };
   } else {
     const tam = document.getElementById('npTamanho').value.trim();
     const pA  = parseBRL(document.getElementById('npPrecoAnt').value);
     const p   = parseBRL(document.getElementById('npPreco').value);
     if(!tam || isNaN(p) || p<=0) { toast('Preencha tamanho e preço!','err'); return; }
-    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco:p, precoAnt:pA, variantes:[], adicionais };
+    dados = { tipo:'simples', nome, titulo:tam, tamanho:tam, descricao, preco:p, precoAnt:pA, variantes:[], adicionais, maxComplementos:maxComp };
   }
 
   try {
@@ -2319,6 +2551,189 @@ const COMPS_PADRAO = [
   { nome:'Granola',          preco:4.00, imgUrl:null, ordem:6 },
 ];
 
+// ── BANNER DE PROMOÇÃO ───────────────────────────
+let _bannerStyle = 'gold';
+let _bannerFechado = false; // se o cliente fechou o banner nesta sessão
+
+const BANNER_STYLES = {
+  gold:   { bg:'linear-gradient(90deg,#1a1000,#2a1a00,#1a1000)', border:'rgba(240,180,41,.25)', color:'#ffe082' },
+  purple: { bg:'linear-gradient(90deg,#0e0820,#180d35,#0e0820)', border:'rgba(139,92,246,.25)',  color:'#c4b5fd' },
+  green:  { bg:'linear-gradient(90deg,#001a10,#002a18,#001a10)', border:'rgba(16,185,129,.25)',  color:'#6ee7b7' },
+  red:    { bg:'linear-gradient(90deg,#1a0010,#2a0018,#1a0010)', border:'rgba(244,63,94,.25)',   color:'#fda4af' },
+  white:  { bg:'rgba(255,255,255,.05)',                           border:'rgba(255,255,255,.1)',  color:'#f0ecff' },
+};
+
+function renderBanner() {
+  const el   = document.getElementById('promoBanner');
+  const txt  = document.getElementById('promoBannerText');
+  const b    = cfg.banner;
+  if(!el) return;
+  if(!b || !b.ativo || !b.texto || _bannerFechado) {
+    el.className = 'promo-banner'; return;
+  }
+  const s = BANNER_STYLES[b.estilo] || BANNER_STYLES.gold;
+  el.style.background   = s.bg;
+  el.style.borderBottom = `1px solid ${s.border}`;
+  el.style.color        = s.color;
+  txt.textContent       = b.texto;
+  el.className          = 'promo-banner show';
+}
+
+window.fecharPromoBanner = function() {
+  _bannerFechado = true;
+  document.getElementById('promoBanner').className = 'promo-banner';
+};
+
+window.abrirModalBanner = function() {
+  const b = cfg.banner || {};
+  _bannerStyle = b.estilo || 'gold';
+  document.getElementById('bannerAtivo').checked = !!b.ativo;
+  document.getElementById('bannerTexto').value   = b.texto || '';
+  // highlight estilo atual
+  document.querySelectorAll('.banner-style-btn').forEach(btn => {
+    btn.classList.toggle('sel', btn.dataset.style === _bannerStyle);
+  });
+  previewBanner();
+  abrirModal('modBanner');
+};
+
+window.selBannerStyle = function(estilo) {
+  _bannerStyle = estilo;
+  document.querySelectorAll('.banner-style-btn').forEach(btn => {
+    btn.classList.toggle('sel', btn.dataset.style === estilo);
+  });
+  previewBanner();
+};
+
+window.previewBanner = function() {
+  const prev  = document.getElementById('bannerPreview');
+  const texto = document.getElementById('bannerTexto').value || 'Digite o texto acima...';
+  const s     = BANNER_STYLES[_bannerStyle] || BANNER_STYLES.gold;
+  prev.textContent          = texto;
+  prev.style.background     = s.bg;
+  prev.style.border         = `1px solid ${s.border}`;
+  prev.style.color          = s.color;
+};
+
+window.salvarBanner = async function() {
+  const texto = document.getElementById('bannerTexto').value.trim();
+  const ativo = document.getElementById('bannerAtivo').checked;
+  if(ativo && !texto) { toast('Digite o texto do banner!', 'err'); return; }
+  cfg.banner = { texto, estilo: _bannerStyle, ativo };
+  try {
+    await fbSet('config', 'site', { banner: cfg.banner });
+    _bannerFechado = false; // reseta o dismiss ao publicar novo banner
+    renderBanner();
+    fecharModal('modBanner');
+    toast('✅ Banner publicado!', 'ok');
+  } catch(e) { toast('❌ Erro: ' + e.message, 'err'); }
+};
+
+window.removerBanner = async function() {
+  cfg.banner = { texto:'', estilo:'gold', ativo: false };
+  try {
+    await fbSet('config', 'site', { banner: cfg.banner });
+    renderBanner();
+    fecharModal('modBanner');
+    toast('Banner removido', 'ok');
+  } catch(e) { toast('❌ Erro: ' + e.message, 'err'); }
+};
+
+// ── CUPONS DE DESCONTO ────────────────────────────
+let cupons       = [];        // lista do Firebase
+let cupomAtivo   = null;      // { codigo, tipo, valor, minimo }
+
+function calcDesconto(subtotal) {
+  if(!cupomAtivo) return 0;
+  if(cupomAtivo.tipo === 'percent') return Math.min(subtotal, subtotal * cupomAtivo.valor / 100);
+  return Math.min(subtotal, cupomAtivo.valor);
+}
+
+window.aplicarCupom = async function() {
+  const codigo = (document.getElementById('cupomInput')?.value || '').trim().toUpperCase();
+  const status = document.getElementById('cupomStatus');
+  if(!codigo) return;
+  const c = cupons.find(x => x.codigo === codigo && x.ativo);
+  if(!c) {
+    status.className = 'cupom-status err';
+    status.innerHTML = '❌ Cupom inválido ou expirado';
+    status.style.display = 'flex';
+    return;
+  }
+  const subtotal = calcTotal() + calcDesconto(calcTotal()); // total sem desconto atual
+  if(c.minimo > 0 && subtotal < c.minimo) {
+    status.className = 'cupom-status err';
+    status.innerHTML = `❌ Pedido mínimo: ${fmt(c.minimo)}`;
+    status.style.display = 'flex';
+    return;
+  }
+  cupomAtivo = c;
+  const descLabel = c.tipo === 'percent' ? `${c.valor}% OFF` : `${fmt(c.valor)} OFF`;
+  status.className = 'cupom-status ok';
+  status.innerHTML = `🎉 Cupom <strong>${c.codigo}</strong> — ${descLabel} <button class="cupom-remove" onclick="removerCupom()">✕</button>`;
+  status.style.display = 'flex';
+  document.getElementById('cupomInput').value = '';
+  atualizarPedido();
+  toast('✅ Cupom aplicado!', 'ok');
+};
+
+window.removerCupom = function() {
+  cupomAtivo = null;
+  const status = document.getElementById('cupomStatus');
+  if(status) status.style.display = 'none';
+  atualizarPedido();
+};
+
+window.abrirModalCupons = function() {
+  renderCuponsAdmin();
+  ['ncCodigo','ncValor','ncMinimo'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('ncTipo').value = 'percent';
+  document.getElementById('ncAtivo').checked = true;
+  abrirModal('modCupons');
+};
+
+function renderCuponsAdmin() {
+  const list = document.getElementById('cuponsAdminList');
+  if(!list) return;
+  if(cupons.length === 0) {
+    list.innerHTML = '<p style="font-size:13px;color:var(--muted);text-align:center;padding:12px">Nenhum cupom cadastrado</p>';
+    return;
+  }
+  list.innerHTML = cupons.map(c => {
+    const valLabel = c.tipo === 'percent' ? `${c.valor}%` : fmt(c.valor);
+    const minLabel = c.minimo > 0 ? ` · mín. ${fmt(c.minimo)}` : '';
+    return `<div class="cupom-admin-item">
+      <span class="cupom-admin-code">${c.codigo}</span>
+      <span class="cupom-admin-val">${valLabel} OFF${minLabel}</span>
+      <span class="cupom-admin-badge ${c.ativo?'on':'off'}">${c.ativo?'ATIVO':'INATIVO'}</span>
+      <button class="var-admin-del" onclick="deletarCupom('${c.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+window.adicionarCupom = async function() {
+  const codigo = (document.getElementById('ncCodigo')?.value||'').trim().toUpperCase();
+  const tipo   = document.getElementById('ncTipo')?.value || 'percent';
+  const valor  = parseBRL(document.getElementById('ncValor')?.value);
+  const minimo = parseBRL(document.getElementById('ncMinimo')?.value);
+  const ativo  = document.getElementById('ncAtivo')?.checked ?? true;
+  if(!codigo || !valor) { toast('Preencha código e valor!','err'); return; }
+  if(cupons.find(c => c.codigo === codigo)) { toast('Código já existe!','err'); return; }
+  const dados = { codigo, tipo, valor, minimo, ativo };
+  const id = await fbAdd('cupons', dados);
+  cupons.push({ id, ...dados });
+  renderCuponsAdmin();
+  toast('✅ Cupom criado!','ok');
+};
+
+window.deletarCupom = async function(id) {
+  await fbDel('cupons', id);
+  cupons = cupons.filter(c => c.id !== id);
+  if(cupomAtivo && cupomAtivo.id === id) removerCupom();
+  renderCuponsAdmin();
+  toast('Cupom removido','ok');
+};
+
 // ── INIT ──────────────────────────────────────────
 async function init() {
   try {
@@ -2327,6 +2742,7 @@ async function init() {
     if(cfgSnap) {
       cfg.pixChave = cfgSnap.pixChave || '31997892312';
       cfg.horario  = cfgSnap.horario  || null;
+      cfg.banner   = cfgSnap.banner   || null;
       cfg.logoUrl  = cfgSnap.logoUrl  || null;
       cfg.zonas    = cfgSnap.zonas    || cfg.zonas;
     }
@@ -2351,6 +2767,9 @@ async function init() {
     }
     complementos = comps.sort((a,b) => (a.ordem||0)-(b.ordem||0));
 
+    // Carregar cupons
+    cupons = await fbList('cupons');
+
   } catch(e) {
     console.error('Erro ao carregar dados:', e);
     toast('Erro ao carregar dados. Verifique a conexão.', 'err');
@@ -2364,6 +2783,7 @@ async function init() {
   }
 
   renderLogo();
+  renderBanner();
   renderProdutos();
   renderComplementos();
   atualizarPedido();
