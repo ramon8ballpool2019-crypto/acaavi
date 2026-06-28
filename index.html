@@ -374,10 +374,16 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 .status-abre{font-size:11px;font-weight:400;opacity:.7;margin-left:2px;}
 .closed-overlay{position:fixed;inset:0;background:rgba(4,3,10,.6);z-index:400;display:none;backdrop-filter:blur(2px);pointer-events:none;}
 .closed-overlay.show{display:block;}
-.closed-card{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#130e1e;border:1px solid rgba(244,63,94,.3);border-radius:18px;padding:20px 24px;z-index:401;text-align:center;max-width:300px;width:88%;pointer-events:all;box-shadow:0 16px 48px rgba(0,0,0,.7);}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.closed-card{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#130e1e;border:1px solid rgba(244,63,94,.3);border-radius:18px;padding:22px 24px 18px;z-index:401;text-align:center;max-width:310px;width:90%;pointer-events:all;box-shadow:0 16px 48px rgba(0,0,0,.7);animation:slideUp .35s ease both;}
 .closed-card h4{font-size:17px;font-weight:700;color:#fda4af;margin-bottom:6px;}
 .closed-card p{font-size:13px;color:var(--muted);line-height:1.65;}
-.closed-card .closed-hours{color:#fda4af;font-weight:600;margin-top:4px;font-size:14px;}
+.closed-card .closed-hours{color:#fda4af;font-weight:600;margin-top:4px;font-size:14px;margin-bottom:16px;}
+.closed-dismiss{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px;line-height:1;transition:.2s;}
+.closed-dismiss:hover{color:var(--text);}
+.closed-countdown{position:absolute;top:12px;left:14px;font-size:10px;color:var(--muted);letter-spacing:.5px;}
+.closed-agendar-btn{width:100%;background:linear-gradient(135deg,rgba(240,180,41,.15),rgba(240,180,41,.08));border:1px solid rgba(240,180,41,.3);color:var(--gold-l);border-radius:12px;padding:11px 16px;font-size:13px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:.2s;margin-top:4px;}
+.closed-agendar-btn:hover{background:rgba(240,180,41,.2);border-color:rgba(240,180,41,.5);}
 .dias-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:14px;}
 .dia-btn{background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:8px;padding:8px 2px;font-size:10px;font-family:'Space Grotesk',sans-serif;color:var(--muted);cursor:pointer;text-align:center;transition:.15s;display:flex;flex-direction:column;gap:2px;align-items:center;}
 .dia-btn span{font-size:14px;font-weight:700;color:var(--text);}
@@ -497,11 +503,15 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 <div class="status-banner" id="statusBanner" style="display:none"></div>
 
 <!-- OVERLAY FECHADO -->
-<div class="closed-overlay" id="closedOverlay"></div>
+<div class="closed-overlay" id="closedOverlay" onclick="fecharClosedCard()"></div>
 <div class="closed-card" id="closedCard" style="display:none">
+  <button class="closed-dismiss" onclick="fecharClosedCard()" title="Fechar">✕</button>
   <h4>😴 Estamos fechados</h4>
   <p>No momento não estamos aceitando pedidos.</p>
   <div class="closed-hours" id="closedHoursInfo"></div>
+  <button class="closed-agendar-btn" onclick="agendarPedido()">
+    📅 Agendar pedido para amanhã
+  </button>
 </div>
 
 <!-- PRODUTOS -->
@@ -527,9 +537,14 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
   </div>
   <!-- barra de limite de complementos -->
   <div class="comp-limit-bar" id="compLimitBar">
-    <span class="comp-limit-text" id="compLimitText">Escolha até <strong id="compLimitMax">?</strong> complementos</span>
-    <div class="comp-limit-fill"><div class="comp-limit-fill-inner" id="compLimitFill" style="width:0%"></div></div>
-    <span class="comp-limit-counter"><span id="compLimitCurrent">0</span>/<span id="compLimitMaxB">?</span></span>
+    <div>
+      <div class="comp-limit-text">🎁 Escolha <strong id="compLimitMax">?</strong> acréscimos grátis</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px">Incluídos no seu pedido — escolha os que preferir</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+      <span class="comp-limit-counter"><span id="compLimitCurrent">0</span> de <span id="compLimitMaxB">?</span></span>
+      <div class="comp-limit-fill" style="width:80px"><div class="comp-limit-fill-inner" id="compLimitFill" style="width:0%"></div></div>
+    </div>
   </div>
 
   <div class="comps-grid" id="compGrid"></div>
@@ -881,8 +896,8 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
     </div>
     <input type="hidden" id="npEditId">
     <div class="mfield">
-      <label>Limite de complementos <span style="color:var(--muted);font-weight:400">(0 = sem limite)</span></label>
-      <input class="minput" type="number" min="0" max="20" id="npMaxComp" placeholder="Ex: 3" value="0">
+      <label>Acréscimos grátis incluídos no produto <span style="color:var(--muted);font-weight:400">(0 = cliente escolhe à vontade)</span></label>
+      <input class="minput" type="number" min="0" max="20" id="npMaxComp" placeholder="Ex: 2 (0 = à vontade)" value="0">
     </div>
     <!-- ADICIONAIS DO PRODUTO -->
     <div class="mfield" style="margin-top:4px;padding-top:10px;border-top:1px solid var(--border2)">
@@ -1131,8 +1146,7 @@ function renderProdutos() {
         <div class="psize">${isVar ? (p.titulo||p.nome) : p.tamanho}</div>
         <div class="pdesc">${p.descricao||''}</div>
         ${priceHtml}
-        ${!isVar && p.maxComplementos > 0 ? `<div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.5px">Até ${p.maxComplementos} complemento${p.maxComplementos>1?'s':''}</div>` : ''}
-        ${isVar && p.maxComplementos > 0 ? `<div style="font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.5px">Até ${p.maxComplementos} complemento${p.maxComplementos>1?'s':''}</div>` : ''}
+        ${p.maxComplementos > 0 ? `<div style="font-size:10px;color:#6ee7b7;margin-top:5px;font-weight:600;letter-spacing:.3px">🎁 ${p.maxComplementos} acréscimo${p.maxComplementos>1?'s':''} grátis à escolha</div>` : ''}
       </div>
       <div class="pimg-wrap" id="pimgwrap-${p.id}">
         ${p.imgUrl ? `<img src="${p.imgUrl}" alt="${p.nome}">` : `<div class="pimg-ph">🍇</div>`}
@@ -1306,7 +1320,7 @@ function toggleComp(c) {
           bar.style.background  = '';
         }, 600);
       }
-      toast(`Limite de ${lim} complemento${lim>1?'s':''} atingido`, 'err');
+      toast(`Limite de ${lim} acréscimo${lim>1?'s':''} grátis atingido`, 'err');
       return;
     }
     compsSel.add(c.id);
@@ -1435,11 +1449,9 @@ function atualizarPedido() {
   // mostrar campo de cupom
   const cupomWrap = document.getElementById('cupomWrap');
   if(cupomWrap) cupomWrap.style.display = 'block';
-  const lojaAberta = estaAberto();
+  const lojaAberta = estaAberto() || !!window._pedidoAgendado;
   btnP.disabled = btnC.disabled = !lojaAberta;
-  if(!lojaAberta) {
-    btnP.title = btnC.title = 'Estamos fechados no momento';
-  }
+  if(!lojaAberta) { btnP.title = btnC.title = 'Estamos fechados no momento'; }
   delt.style.display = 'flex'; obs.style.display = 'block';
   flt.classList.add('show');
   fval.textContent = fmt(total);
@@ -1669,22 +1681,77 @@ function renderStatusBanner() {
 
   // overlay de fechado — só mostra se não for admin
   if(!modoAdmin) {
-    if(overlay) overlay.classList.toggle('show', !aberto);
+    const agendado = !!window._pedidoAgendado;
+    if(overlay) overlay.classList.toggle('show', !aberto && !_closedCardDismissed && !agendado);
     if(card) {
-      card.style.display = aberto ? 'none' : 'block';
-      if(info) info.textContent = proximaAbertura();
+      // Só mostra o card UMA VEZ por sessão de fechamento
+      if(!aberto && !_closedCardDismissed && !agendado) {
+        card.style.display = 'block';
+        if(info) info.textContent = proximaAbertura();
+      } else if(aberto) {
+        // loja abriu: reseta o flag para mostrar de novo na próxima vez que fechar
+        card.style.display = 'none';
+        _closedCardDismissed = false;
+        window._pedidoAgendado = false;
+      }
     }
-    // bloquear botões de pagamento
+    // botões: bloqueados quando fechado, liberados se agendado
     const btnP = document.getElementById('btnPagar');
     const btnC = document.getElementById('btnCartao');
-    if(btnP) btnP.disabled = !aberto || !prodSel;
-    if(btnC) btnC.disabled = !aberto || !prodSel;
+    const podeComprar = aberto || agendado;
+    if(btnP) btnP.disabled = !podeComprar || !prodSel;
+    if(btnC) btnC.disabled = !podeComprar || !prodSel;
   } else {
     if(overlay) overlay.classList.remove('show');
     if(card) card.style.display = 'none';
   }
   } catch(e) { console.warn('renderStatusBanner:', e); }
 }
+
+let _closedCardDismissed = false;
+
+window.fecharClosedCard = function() {
+  _closedCardDismissed = true;
+  const card    = document.getElementById('closedCard');
+  const overlay = document.getElementById('closedOverlay');
+  if(card)    card.style.display = 'none';
+  if(overlay) overlay.classList.remove('show');
+};
+
+window.agendarPedido = function() {
+  window._pedidoAgendado = true;
+  _closedCardDismissed = true;
+  fecharClosedCard();
+
+  const h    = cfg.horario;
+  const prox = proximaAbertura();
+
+  // preenche observação com agendamento
+  const obsArea = document.getElementById('obsArea');
+  if(obsArea) {
+    obsArea.style.display = 'block';
+    if(!obsArea.value.includes('AGENDADO')) {
+      obsArea.value = `⏰ PEDIDO AGENDADO — entregar ${prox || 'quando abrir'}`;
+    }
+  }
+
+  // libera botões de pagamento
+  const btnP = document.getElementById('btnPagar');
+  const btnC = document.getElementById('btnCartao');
+  if(prodSel) {
+    if(btnP) { btnP.disabled = false; btnP.title = ''; }
+    if(btnC) { btnC.disabled = false; btnC.title = ''; }
+  }
+
+  // atualiza banner
+  const banner = document.getElementById('statusBanner');
+  if(banner) {
+    banner.className = 'status-banner closed';
+    banner.innerHTML = `<div class="status-dot"></div> Fechado — <span class="status-abre">📅 Pedido agendado para ${prox || 'quando abrir'}</span>`;
+  }
+
+  toast(`📅 Monte seu pedido! Será enviado ${prox || 'quando abrirmos'}.`, 'ok');
+};
 
 // Atualizar a cada minuto automaticamente
 setInterval(() => { renderStatusBanner(); }, 60000);
@@ -1804,6 +1871,7 @@ window.abrirVariantePicker = function(p) {
 window.selecionarVariante = function(p, v) {
   _varPickerVariante = v;
   const adics = p.adicionais || [];
+  const limite = p.maxComplementos > 0 ? p.maxComplementos : 0;
 
   // Sem adicionais → confirma direto
   if(adics.length === 0) { _confirmarVarianteComAdics(p, v, new Set()); return; }
@@ -1814,8 +1882,39 @@ window.selecionarVariante = function(p, v) {
   document.getElementById('varTamanhoSel').textContent    = `${v.tamanho} — ${fmt(v.preco)}`;
   document.getElementById('varConfirmarBtn').style.display = '';
 
+  // injeta cabeçalho com limite + contador
   const grid = document.getElementById('varCompsList');
   grid.innerHTML = '';
+
+  if(limite > 0) {
+    const header = document.createElement('div');
+    header.id = 'adic-header';
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:rgba(240,180,41,.07);border:1px solid rgba(240,180,41,.15);border-radius:10px;padding:9px 14px;margin-bottom:4px;font-size:13px;';
+    header.innerHTML = `<span style="color:rgba(240,180,41,.85);font-weight:500">🎁 Escolha até <strong>${limite}</strong> acréscimo${limite>1?'s':''} grátis</span><span id="adic-counter" style="font-weight:700;color:var(--gold-l)">0/${limite}</span>`;
+    grid.appendChild(header);
+  }
+
+  function atualizarEstadoAdics() {
+    const sel = _varPickerAdics.size;
+    const atingido = limite > 0 && sel >= limite;
+    const counter = document.getElementById('adic-counter');
+    if(counter) {
+      counter.textContent = `${sel}/${limite}`;
+      counter.style.color = atingido ? '#fda4af' : 'var(--gold-l)';
+    }
+    adics.forEach((_, idx) => {
+      const r = document.getElementById('adic-opt-'+idx);
+      if(!r) return;
+      if(atingido && !_varPickerAdics.has(idx)) {
+        r.style.opacity = '.35';
+        r.style.pointerEvents = 'none';
+      } else {
+        r.style.opacity = '';
+        r.style.pointerEvents = '';
+      }
+    });
+  }
+
   adics.forEach((a, i) => {
     const row = document.createElement('div');
     row.className = 'adic-opt';
@@ -1831,14 +1930,28 @@ window.selecionarVariante = function(p, v) {
       </div>`;
     row.onclick = () => {
       if(_varPickerAdics.has(i)) {
+        // sempre pode desmarcar
         _varPickerAdics.delete(i);
         row.classList.remove('selected');
         row.querySelector('.adic-chk').textContent = '';
       } else {
+        // verificar limite antes de marcar
+        if(limite > 0 && _varPickerAdics.size >= limite) {
+          // pisca o header
+          const h = document.getElementById('adic-header');
+          if(h) {
+            h.style.borderColor = 'rgba(244,63,94,.5)';
+            h.style.background  = 'rgba(244,63,94,.08)';
+            setTimeout(()=>{ h.style.borderColor=''; h.style.background=''; }, 500);
+          }
+          toast(`Limite de ${limite} acréscimo${limite>1?'s':''} atingido`, 'err');
+          return;
+        }
         _varPickerAdics.add(i);
         row.classList.add('selected');
         row.querySelector('.adic-chk').textContent = '✓';
       }
+      atualizarEstadoAdics();
     };
     grid.appendChild(row);
   });
@@ -1850,6 +1963,7 @@ window.varVoltarTamanho = function() {
   document.getElementById('varStepTamanho').style.display = '';
   document.getElementById('varStepComps').style.display   = 'none';
   document.getElementById('varConfirmarBtn').style.display = 'none';
+  document.getElementById('varCompsList').innerHTML = '';
 };
 
 window.confirmarVariante = function() {
@@ -1948,8 +2062,8 @@ window.editarProdInline = function(id) {
       </div>
 
       <div class="inline-field" style="max-width:200px">
-        <label>Limite de complementos <span style="color:var(--muted);font-weight:400">(0 = sem limite)</span></label>
-        <input class="minput" type="number" min="0" max="20" id="ie-maxcomp-${id}" value="${p.maxComplementos||0}" placeholder="0 = ilimitado">
+        <label>Acréscimos grátis incluídos no produto <span style="color:var(--muted);font-weight:400">(0 = cliente escolhe à vontade)</span></label>
+        <input class="minput" type="number" min="0" max="20" id="ie-maxcomp-${id}" value="${p.maxComplementos||0}" placeholder="Ex: 2 (0 = à vontade)">
       </div>
 
       <div class="inline-field" style="margin-bottom:2px">
