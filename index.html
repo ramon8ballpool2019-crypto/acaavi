@@ -4,6 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Açaví — Açaí Premium</title>
+
+<!-- SEO -->
+<meta name="description" content="Açaí puro, cremoso e delicioso! Monte seu pedido agora e receba em casa.">
+<meta name="theme-color" content="#04030a">
+
+<!-- Open Graph (WhatsApp, Facebook, Telegram) -->
+<meta property="og:type"        content="website">
+<meta property="og:title"       content="Açaví — Açaí Premium 🍇">
+<meta property="og:description" content="Açaí puro, cremoso e delicioso! Monte seu pedido agora e receba em casa.">
+<meta property="og:image"       content="" id="ogImageMeta">
+<meta property="og:image:width" content="600">
+<meta property="og:image:height"content="600">
+<meta property="og:url"         content="https://acaavi.vercel.app">
+<meta property="og:locale"      content="pt_BR">
+
+<!-- Twitter / X -->
+<meta name="twitter:card"        content="summary">
+<meta name="twitter:title"       content="Açaví — Açaí Premium 🍇">
+<meta name="twitter:description" content="Açaí puro, cremoso e delicioso! Monte seu pedido agora.">
+<meta name="twitter:image"       content="" id="twImageMeta">
+
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Fredoka+One&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -463,6 +484,7 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
   <span class="admin-bar-title">✏️ Modo Edição</span>
   <div class="admin-btns">
     <button class="abtn" onclick="abrirModalPix()">💳 Chave PIX</button>
+    <button class="abtn" onclick="abrirModalCompartilhamento()">🔗 Compartilhamento</button>
     <button class="abtn" onclick="abrirModalHorario()">🕐 Horário</button>
     <button class="abtn" onclick="abrirModalZonas()">🛵 Zonas</button>
     <button class="abtn" onclick="abrirModalBanner()">🎉 Banner</button>
@@ -723,6 +745,35 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
     <div class="mfield"><input class="minput" type="password" id="passInput" placeholder="Senha" onkeydown="if(event.key==='Enter')verificarSenha()"></div>
     <div class="merror" id="passErro">Senha incorreta.</div>
     <div class="mactions"><button class="mbtn" onclick="fecharModal('modAdmin')">Cancelar</button><button class="mbtn primary" onclick="verificarSenha()">Entrar</button></div>
+  </div>
+</div>
+
+<!-- MODAL COMPARTILHAMENTO -->
+<div class="moverlay" id="modCompartilhamento">
+  <div class="mbox">
+    <h3>🔗 Preview ao Compartilhar</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Aparece quando alguém compartilha o link no WhatsApp, Instagram ou Telegram.</p>
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:18px">
+      <div style="height:120px;background:linear-gradient(135deg,#1a0a2e,#3b0764);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;overflow:hidden">
+        <img id="ogPreviewLogoImg" src="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none">
+        <span id="ogPreviewEmoji">🍇</span>
+      </div>
+      <div style="padding:12px 14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px" id="ogPreviewUrl">acaavi.vercel.app</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:3px" id="ogPreviewTitle">Açaví — Açaí Premium 🍇</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5" id="ogPreviewDesc">Açaí puro, cremoso e delicioso!</div>
+      </div>
+    </div>
+    <div class="mfield"><label>Título</label><input class="minput" id="ogTitulo" placeholder="Açaví — Açaí Premium 🍇" oninput="previewOg()"></div>
+    <div class="mfield"><label>Descrição</label><input class="minput" id="ogDescricao" placeholder="Açaí puro, cremoso e delicioso! Monte seu pedido agora." oninput="previewOg()"></div>
+    <div class="mfield"><label>URL do site</label><input class="minput" id="ogUrl" placeholder="https://acaavi.vercel.app" oninput="previewOg()"></div>
+    <div style="background:rgba(240,180,41,.06);border:1px solid rgba(240,180,41,.15);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(240,180,41,.8);margin-bottom:4px">
+      💡 A imagem de capa é o logo da sua loja — adicione clicando na foto circular no topo enquanto estiver no Admin.
+    </div>
+    <div class="mactions">
+      <button class="mbtn" onclick="fecharModal('modCompartilhamento')">Cancelar</button>
+      <button class="mbtn primary" onclick="salvarCompartilhamento()">✅ Salvar</button>
+    </div>
   </div>
 </div>
 
@@ -1093,8 +1144,16 @@ function renderLogo() {
   const emp  = document.getElementById('logoEmpty');
   const ring = document.getElementById('logoRing');
   const src  = cfg.logoUrl || null;
-  if(src){ img.src=src; img.style.display='block'; emp.style.display='none'; }
-  else   { img.style.display='none'; emp.style.display='flex'; }
+  if(src) {
+    img.src=src; img.style.display='block'; emp.style.display='none';
+    // Atualiza as meta tags de compartilhamento com o logo real
+    const ogImg = document.querySelector('meta[property="og:image"]');
+    const twImg = document.querySelector('meta[name="twitter:image"]');
+    if(ogImg) ogImg.setAttribute('content', src);
+    if(twImg) twImg.setAttribute('content', src);
+  } else {
+    img.style.display='none'; emp.style.display='flex';
+  }
   ring.classList.toggle('editable', modoAdmin);
 }
 
@@ -2665,6 +2724,68 @@ const COMPS_PADRAO = [
   { nome:'Granola',          preco:4.00, imgUrl:null, ordem:6 },
 ];
 
+// ── COMPARTILHAMENTO / OPEN GRAPH ────────────────
+window.abrirModalCompartilhamento = function() {
+  const s = cfg.sharing || {};
+  document.getElementById('ogTitulo').value    = s.titulo    || 'Açaví — Açaí Premium 🍇';
+  document.getElementById('ogDescricao').value = s.descricao || 'Açaí puro, cremoso e delicioso! Monte seu pedido agora.';
+  document.getElementById('ogUrl').value       = s.url       || window.location.origin;
+  previewOg();
+  abrirModal('modCompartilhamento');
+};
+
+window.previewOg = function() {
+  const t = document.getElementById('ogTitulo')?.value    || 'Açaví — Açaí Premium 🍇';
+  const d = document.getElementById('ogDescricao')?.value || 'Açaí puro, cremoso e delicioso!';
+  const u = document.getElementById('ogUrl')?.value       || 'acaavi.vercel.app';
+  const el_t = document.getElementById('ogPreviewTitle');
+  const el_d = document.getElementById('ogPreviewDesc');
+  const el_u = document.getElementById('ogPreviewUrl');
+  const el_i = document.getElementById('ogPreviewLogoImg');
+  const el_e = document.getElementById('ogPreviewEmoji');
+  if(el_t) el_t.textContent = t;
+  if(el_d) el_d.textContent = d;
+  if(el_u) el_u.textContent = u.replace(/https?:\/\//,'');
+  // mostra logo no preview se disponível
+  if(el_i && cfg.logoUrl) {
+    el_i.src = cfg.logoUrl;
+    el_i.style.display = 'block';
+    if(el_e) el_e.style.display = 'none';
+  }
+};
+
+window.salvarCompartilhamento = async function() {
+  const titulo    = document.getElementById('ogTitulo')?.value.trim()    || 'Açaví — Açaí Premium 🍇';
+  const descricao = document.getElementById('ogDescricao')?.value.trim() || 'Açaí puro, cremoso e delicioso!';
+  const url       = document.getElementById('ogUrl')?.value.trim()       || window.location.origin;
+  cfg.sharing = { titulo, descricao, url };
+  try {
+    await fbSet('config', 'site', { sharing: cfg.sharing });
+    aplicarMetaTags();
+    fecharModal('modCompartilhamento');
+    toast('✅ Configuração salva!', 'ok');
+  } catch(e) { toast('❌ Erro: '+e.message,'err'); }
+};
+
+function aplicarMetaTags() {
+  const s = cfg.sharing || {};
+  const titulo    = s.titulo    || 'Açaví — Açaí Premium 🍇';
+  const descricao = s.descricao || 'Açaí puro, cremoso e delicioso! Monte seu pedido agora.';
+  const url       = s.url       || window.location.href;
+  const imagem    = cfg.logoUrl || '';
+  // atualizar todas as meta tags
+  const set = (sel, attr, val) => { const el=document.querySelector(sel); if(el) el.setAttribute(attr,val); };
+  document.title = titulo;
+  set('meta[name="description"]',         'content', descricao);
+  set('meta[property="og:title"]',        'content', titulo);
+  set('meta[property="og:description"]',  'content', descricao);
+  set('meta[property="og:url"]',          'content', url);
+  set('meta[property="og:image"]',        'content', imagem);
+  set('meta[name="twitter:title"]',       'content', titulo);
+  set('meta[name="twitter:description"]', 'content', descricao);
+  set('meta[name="twitter:image"]',       'content', imagem);
+}
+
 // ── BANNER DE PROMOÇÃO ───────────────────────────
 let _bannerStyle = 'gold';
 let _bannerFechado = false; // se o cliente fechou o banner nesta sessão
@@ -2858,6 +2979,7 @@ async function init() {
       cfg.horario  = cfgSnap.horario  || null;
       cfg.banner   = cfgSnap.banner   || null;
       cfg.logoUrl  = cfgSnap.logoUrl  || null;
+      cfg.sharing  = cfgSnap.sharing  || null;
       cfg.zonas    = cfgSnap.zonas    || cfg.zonas;
     }
 
@@ -2897,6 +3019,7 @@ async function init() {
   }
 
   renderLogo();
+  aplicarMetaTags();
   renderBanner();
   renderProdutos();
   renderComplementos();
