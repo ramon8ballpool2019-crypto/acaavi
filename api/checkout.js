@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   const data = await response.json();
 
   if (data.id) {
-    res.status(200).json({ url: data.sandbox_init_point });
+       res.status(200).json({ url: data.init_point });
   } else {
     res.status(500).json({ error: 'Erro ao criar preferência', detail: data });
   }
