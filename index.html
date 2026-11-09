@@ -740,11 +740,24 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 <!-- MODALS -->
 <div class="moverlay" id="modAdmin">
   <div class="mbox">
-    <h3>Modo Edição</h3>
-    <p>Digite a senha para editar o cardápio</p>
-    <div class="mfield"><input class="minput" type="password" id="passInput" placeholder="Senha" onkeydown="if(event.key==='Enter')verificarSenha()"></div>
-    <div class="merror" id="passErro">Senha incorreta.</div>
+    <h3>Área do administrador</h3>
+    <p>Entre com seu e-mail e senha para editar o cardápio</p>
+    <div class="mfield"><input class="minput" type="email" id="adminEmail" placeholder="E-mail" autocomplete="username"></div>
+    <div class="mfield"><input class="minput" type="password" id="passInput" placeholder="Senha" autocomplete="current-password" onkeydown="if(event.key==='Enter')verificarSenha()"></div>
+    <div class="merror" id="passErro">E-mail ou senha incorretos.</div>
     <div class="mactions"><button class="mbtn" onclick="fecharModal('modAdmin')">Cancelar</button><button class="mbtn primary" onclick="verificarSenha()">Entrar</button></div>
+  </div>
+</div>
+
+<!-- MODAL RETORNO DO PAGAMENTO (cartão) -->
+<div class="moverlay" id="modRetornoPagamento">
+  <div class="mbox" style="text-align:center">
+    <h3 id="retPagTitulo"></h3>
+    <p id="retPagTexto"></p>
+    <div class="mactions" style="justify-content:center">
+      <button class="mbtn" onclick="fecharRetornoPagamento()">Fechar</button>
+      <button class="mbtn primary" id="retPagBtn" onclick="enviarPedidoPagoWhats()">Enviar pedido no WhatsApp</button>
+    </div>
   </div>
 </div>
 
@@ -1027,6 +1040,7 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 // ══════════════════════════════════════════════════
 // CONFIGURAÇÕES — substitua pelos seus valores
@@ -1043,12 +1057,12 @@ const firebaseConfig = {
 const CLOUDINARY_CLOUD = 'dw3hgm58g';
 const CLOUDINARY_PRESET = 'acaavi';
 const WA_NUM = "5531935009402";
-const ADMIN_SENHA = "acaavi2024"; // ← Troque pela sua senha!
 const TAXA_ENTREGA = 6.99;
 
 // ── INIT FIREBASE ──────────────────────────────────
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
+const auth = getAuth(app);
 
 // ── ESTADO ────────────────────────────────────────
 let modoAdmin   = false;
@@ -1552,7 +1566,8 @@ window.confirmarEPagar = async function(tipo) {
     try {
       toast('Abrindo pagamento com cartão...', 'ok');
       const scs = complementos.filter(c => compsSel.has(c.id));
-      let descricao = `Açaví - ${prodSel.nome} ${prodSel.tamanho}`;
+      salvarPedidoPendente();
+      let descricao = `Açaví - ${nomeAcaiPedido()}`;
       if(scs.length) descricao += ` + ${scs.map(c=>c.nome).join(', ')}`;
       const resp = await fetch('/api/checkout', {
         method: 'POST',
@@ -1588,30 +1603,108 @@ window.copiarPix = function() {
   setTimeout(()=>{ b.textContent = 'Copiar'; b.classList.remove('ok'); }, 2500);
 };
 
-window.enviarWhats = function() {
-  if(!prodSel) return;
+function nomeAcaiPedido() {
+  const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
+  // Não repete o tamanho quando ele já está no nome do açaí
+  const numTam = (String(labelTamanho||'').match(/\d+/) || [''])[0];
+  const tamNoNome = numTam && new RegExp('(^|\\D)' + numTam + '\\s*(ml|l|litro|litros|g|kg)', 'i').test(String(prodSel.nome||''));
+  return tamNoNome ? prodSel.nome : `${prodSel.nome} ${labelTamanho||''}`.trim();
+}
+
+function montarMensagemPedido() {
   const obs  = document.getElementById('obsArea').value.trim();
   const scs  = complementos.filter(c => compsSel.has(c.id));
   const total = calcTotal();
   const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
-  const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
-  let msg = `🍇 *Pedido Açaví*\n\n*${prodSel.nome} ${labelTamanho}* — ${fmt(precoBase)}\n`;
+
+  let msg = `🍇 *PEDIDO AÇAVÍ*\n\n*${nomeAcaiPedido()}* — ${fmt(precoBase)}\n`;
   (prodSel.adicionaisEscolhidos||[]).forEach(a => {
     msg += `  ➕ ${a.nome}${a.preco>0?' — '+fmt(a.preco):' (Grátis)'}\n`;
   });
-  if(scs.length){ msg+=`\n*Complementos:*\n`; scs.forEach(c=>{ msg+=`• ${c.nome} — ${fmt(c.preco)}\n`; }); }
+  if(scs.length){
+    msg += `\n*Complementos (${scs.length}):*\n`;
+    scs.forEach(c=>{ msg += `• ${c.nome} — ${fmt(c.preco)}\n`; });
+  }
   if(tipoEntrega==='entrega') {
     const taxa = getTaxaEntrega();
     const zona = cfg.zonas.find(z=>z.id===zonaSelId);
-    msg+=`\n🛵 Entrega${zona?' — '+zona.nome:''}: ${fmt(taxa)}\n`;
+    msg += `\n🛵 *Entrega${zona?' — '+zona.nome:''}:* ${taxa>0?fmt(taxa):'Grátis'}\n`;
+  } else {
+    msg += `\n🏪 *Retirada no local*\n`;
   }
   if(cupomAtivo) {
     const desconto = calcDesconto(total + calcDesconto(total));
-    msg+=`\n🏷️ Cupom *${cupomAtivo.codigo}*: −${fmt(desconto)}\n`;
+    msg += `\n🏷️ Cupom *${cupomAtivo.codigo}*: −${fmt(desconto)}\n`;
   }
-  msg+=`\n💳 *Total pago via PIX: ${fmt(total)}*`;
-  msg+=`\n📋 *Tipo:* ${tipoEntrega==='entrega'?'Delivery':'Retirada no local'}`;
-  if(obs) msg+=`\n\n📝 *Obs:* ${obs}`;
+  msg += `\n💰 *Total: ${fmt(total)}*`;
+  if(obs) msg += `\n\n📝 *Obs:* ${obs}`;
+  return msg;
+}
+
+window.enviarWhats = function() {
+  if(!prodSel) return;
+  const msg = montarMensagemPedido() + `\n\n✅ Segue o comprovante de pagamento.`;
+  window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(msg)}`, '_blank');
+};
+
+// ── PEDIDO NO CARTÃO: guarda o pedido e, na volta do pagamento, envia ao WhatsApp ──
+const CHAVE_PEDIDO_PENDENTE = 'acaavi_pedido_pendente';
+
+function salvarPedidoPendente() {
+  try {
+    localStorage.setItem(CHAVE_PEDIDO_PENDENTE, JSON.stringify({ msg: montarMensagemPedido(), total: calcTotal(), ts: Date.now() }));
+  } catch(e) {}
+}
+
+function tratarRetornoPagamento() {
+  const params = new URLSearchParams(location.search);
+  const status = params.get('pagamento');
+  if(!status) return;
+  const pagamentoId = params.get('payment_id') || params.get('collection_id') || '';
+
+  let pendente = null;
+  try {
+    pendente = JSON.parse(localStorage.getItem(CHAVE_PEDIDO_PENDENTE) || 'null');
+    if(pendente && Date.now() - pendente.ts > 24*60*60*1000) pendente = null; // ignora pedido com mais de 24h
+  } catch(e) {}
+  window.__retornoPagamento = { status, pagamentoId, pendente };
+
+  const titulo = document.getElementById('retPagTitulo');
+  const texto  = document.getElementById('retPagTexto');
+  const btn    = document.getElementById('retPagBtn');
+  if(status === 'aprovado') {
+    titulo.textContent = 'Pagamento aprovado! 🎉';
+    texto.textContent  = 'Falta só um passo: envie seu pedido pelo WhatsApp para a gente começar o preparo.';
+    btn.style.display  = '';
+  } else if(status === 'pendente') {
+    titulo.textContent = 'Pagamento em análise ⏳';
+    texto.textContent  = 'O Mercado Pago ainda está confirmando seu pagamento. Envie seu pedido pelo WhatsApp para a gente registrar.';
+    btn.style.display  = '';
+  } else {
+    titulo.textContent = 'Não foi possível concluir o pagamento';
+    texto.textContent  = 'Você pode tentar de novo ou pagar pelo PIX.';
+    btn.style.display  = 'none';
+  }
+  abrirModal('modRetornoPagamento');
+}
+
+window.fecharRetornoPagamento = function() {
+  fecharModal('modRetornoPagamento');
+  try { history.replaceState(null, '', location.pathname); } catch(e) {}
+};
+
+window.enviarPedidoPagoWhats = function() {
+  const r = window.__retornoPagamento || {};
+  const linhaStatus = r.status === 'aprovado' ? '✅ Pagamento aprovado pelo Mercado Pago.' : '⏳ Pagamento em análise no Mercado Pago.';
+  const linhaRef = r.pagamentoId ? `\n🧾 Pagamento nº ${r.pagamentoId}` : '';
+  let msg;
+  if(r.pendente && r.pendente.msg) {
+    msg = `${r.pendente.msg}\n\n${linhaStatus}${linhaRef}`;
+  } else {
+    msg = `🍇 *PEDIDO AÇAVÍ*\n\n${linhaStatus}${linhaRef}\n\nOlá! Fiz o pagamento pelo site e quero confirmar meu pedido.`;
+  }
+  try { localStorage.removeItem(CHAVE_PEDIDO_PENDENTE); } catch(e) {}
+  fecharRetornoPagamento();
   window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent(msg)}`, '_blank');
 };
 
@@ -2634,16 +2727,31 @@ async function executarDel() {
 
 // ── ADMIN ─────────────────────────────────────────
 window.abrirModalAdmin = function() {
+  if(modoAdmin) { sairAdmin(); return; }
+  if(auth.currentUser) { entrarAdmin(); return; }
+  document.getElementById('adminEmail').value = '';
   document.getElementById('passInput').value = '';
   document.getElementById('passErro').style.display = 'none';
   abrirModal('modAdmin');
-  setTimeout(()=>document.getElementById('passInput').focus(), 150);
+  setTimeout(()=>document.getElementById('adminEmail').focus(), 150);
 };
-window.verificarSenha = function() {
-  if(document.getElementById('passInput').value === ADMIN_SENHA) {
+window.verificarSenha = async function() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const senha = document.getElementById('passInput').value;
+  const erro  = document.getElementById('passErro');
+  erro.style.display = 'none';
+  if(!email || !senha) { erro.textContent = 'Digite o e-mail e a senha.'; erro.style.display = 'block'; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+    document.getElementById('passInput').value = '';
     fecharModal('modAdmin'); entrarAdmin();
-  } else {
-    document.getElementById('passErro').style.display = 'block';
+  } catch(e) {
+    const code = e && e.code;
+    erro.textContent =
+      code === 'auth/too-many-requests'     ? 'Muitas tentativas. Aguarde alguns minutos e tente de novo.' :
+      code === 'auth/network-request-failed' ? 'Sem conexão. Verifique a internet.' :
+      'E-mail ou senha incorretos.';
+    erro.style.display = 'block';
   }
 };
 function entrarAdmin() {
@@ -2658,6 +2766,7 @@ function entrarAdmin() {
 }
 window.sairAdmin = function() {
   modoAdmin = false;
+  signOut(auth).catch(()=>{});
   document.getElementById('adminBar').classList.remove('open');
   document.getElementById('heroEl').classList.remove('pad-top');
   document.getElementById('adminToggle').textContent = '⚙️ Admin';
@@ -3028,6 +3137,7 @@ async function init() {
   renderStatusBanner();
   renderZonaSelect();
   renderEntregaInfo();
+  try { tratarRetornoPagamento(); } catch(e) { console.error(e); }
 }
 
 init();
