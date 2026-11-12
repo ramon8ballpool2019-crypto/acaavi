@@ -516,7 +516,6 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 <!-- NAV -->
 <nav class="nav" id="mainNav">
   <a href="#produtos" class="active">Cardápio</a>
-  <a href="#complementos">Complementos</a>
   <a href="#pedido">Meu Pedido</a>
   <a href="#info">Entrega</a>
 </nav>
@@ -548,8 +547,10 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
   <div class="products-grid" id="prodGrid"></div>
 </section>
 
-<!-- COMPLEMENTOS -->
-<section id="complementos">
+<!-- COMPLEMENTOS: escondida. Os complementos agora ficam dentro de cada açaí (seletor de tamanho).
+     Ela só reaparece para produtos SEM tamanhos que tenham complementos incluídos (maxComplementos > 0).
+     Para voltar a mostrar sempre: tire o style="display:none" abaixo e recoloque o link no menu. -->
+<section id="complementos" style="display:none">
   <div class="sec-header">
     <div>
       <span class="sec-label">Adicionais</span>
@@ -1471,7 +1472,18 @@ function contarItens() {
   return 1 + adics + compsSel.size;
 }
 
+// A seção "Complementos" da página só aparece quando o produto escolhido NÃO tem tamanhos
+// (ou seja, não usa o seletor) e tem complementos incluídos. Nos demais, ficam dentro do açaí.
+function atualizarSecaoComplementos() {
+  const sec = document.getElementById('complementos');
+  if(!sec) return;
+  const temTamanhos = !!(prodSel && prodSel.tipo === 'variantes' && Array.isArray(prodSel.variantes) && prodSel.variantes.length > 0);
+  const precisa = !!(prodSel && !temTamanhos && prodSel.maxComplementos > 0);
+  sec.style.display = precisa ? '' : 'none';
+}
+
 function atualizarPedido() {
+  atualizarSecaoComplementos();
   const lines  = document.getElementById('orderLines');
   const btnP   = document.getElementById('btnPagar');
   const btnC   = document.getElementById('btnCartao');
@@ -2819,7 +2831,7 @@ document.querySelectorAll('.moverlay').forEach(m => {
 // ── NAV ───────────────────────────────────────────
 window.addEventListener('scroll', () => {
   let cur = '';
-  ['produtos','complementos','pedido','info'].forEach(id => {
+  ['produtos','pedido','info'].forEach(id => {
     const el = document.getElementById(id);
     if(el && window.scrollY >= el.offsetTop - 110) cur = id;
   });
