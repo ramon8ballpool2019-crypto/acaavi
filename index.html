@@ -65,7 +65,7 @@ input[type=file]{display:none;}
 .loading-text{font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;}
 
 /* ═══ TOAST ═══ */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#130e1e;border:1px solid var(--border);border-radius:12px;padding:12px 22px;font-size:13px;z-index:2000;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5);}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#130e1e;border:1px solid var(--border);border-radius:12px;padding:12px 22px;font-size:13px;z-index:2000;opacity:0;transition:.3s;pointer-events:none;white-space:normal;width:max-content;max-width:90vw;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.ok{border-color:var(--green);color:#6ee7b7;}
 .toast.err{border-color:var(--red);color:#fda4af;}
@@ -1569,14 +1569,24 @@ window.confirmarEPagar = async function(tipo) {
       salvarPedidoPendente();
       let descricao = `Açaví - ${nomeAcaiPedido()}`;
       if(scs.length) descricao += ` + ${scs.map(c=>c.nome).join(', ')}`;
+      // O servidor recalcula o valor com os preços reais; aqui vai só o que o cliente escolheu
+      const pedido = {
+        produtoId: prodSel.id,
+        varianteId: (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.id : null,
+        adicionais: prodSel.adicionaisIdx || [],
+        complementos: [...compsSel],
+        entrega: tipoEntrega === 'entrega',
+        zonaId: zonaSelId || null,
+        cupom: cupomAtivo ? cupomAtivo.codigo : null
+      };
       const resp = await fetch('/api/checkout', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ total, descricao })
+        body: JSON.stringify({ total, descricao, pedido })
       });
       const data = await resp.json();
       if(data.url) window.open(data.url, '_blank');
-      else toast('❌ Erro ao abrir pagamento. Tente o PIX.', 'err');
+      else toast('❌ ' + (data.mensagem || 'Erro ao abrir pagamento. Tente o PIX.'), 'err');
     } catch { toast('❌ Erro de conexão. Tente o PIX.', 'err'); }
     return;
   }
@@ -2124,8 +2134,9 @@ window.confirmarVariante = function() {
 };
 
 function _confirmarVarianteComAdics(p, v, adicsSet) {
-  const adicsEscolhidos = [...adicsSet].map(i => p.adicionais[i]).filter(Boolean);
-  prodSel = { ...p, varianteSel: v, adicionaisEscolhidos: adicsEscolhidos };
+  const adicsIdx = [...adicsSet].filter(i => p.adicionais && p.adicionais[i]);
+  const adicsEscolhidos = adicsIdx.map(i => p.adicionais[i]);
+  prodSel = { ...p, varianteSel: v, adicionaisEscolhidos: adicsEscolhidos, adicionaisIdx: adicsIdx };
   fecharModal('modVariantes');
   renderProdutos();
   renderLimitBar();
