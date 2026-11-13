@@ -274,6 +274,16 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
 .obs-area{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;padding:12px 16px;margin-top:12px;resize:none;outline:none;transition:.2s;}
 .obs-area:focus{border-color:rgba(201,162,39,.4);}
 .obs-area::placeholder{color:var(--muted);}
+.cli-box{margin-top:14px;padding:14px;background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:14px;}
+.cli-title{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold-l);margin-bottom:10px;}
+.cli-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.cli-grid-end{grid-template-columns:1fr 90px;}
+.cli-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+.cli-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:10px;padding:11px 12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:.2s;}
+.cli-input:focus{border-color:rgba(240,180,41,.4);}
+.cli-input::placeholder{color:var(--muted);}
+.cli-erro{border-color:#ef4444 !important;background:rgba(239,68,68,.08) !important;}
+@media(max-width:420px){.cli-grid{grid-template-columns:1fr;}.cli-grid-end{grid-template-columns:1fr 80px;}}
 .payment-btns{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
 .security-badge{display:flex;align-items:center;justify-content:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 16px;margin-top:4px;flex-wrap:wrap;}
 .security-badge-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
@@ -489,6 +499,7 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
     <button class="abtn" onclick="abrirModalZonas()">🛵 Zonas</button>
     <button class="abtn" onclick="abrirModalBanner()">🎉 Banner</button>
     <button class="abtn" onclick="abrirModalCupons()">🏷️ Cupons</button>
+    <button class="abtn" onclick="baixarBackup()">💾 Backup</button>
     <button class="abtn save" onclick="sairAdmin()">✅ Salvar & Sair</button>
   </div>
 </div>
@@ -594,7 +605,25 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
         <div class="zona-min-info">Valor pode variar conforme endereço</div>
       </div>
     </div>
-    <textarea class="obs-area" id="obsArea" rows="2" placeholder="Endereço de entrega, observações..." style="display:none"></textarea>
+    <div class="cli-box" id="clienteBox" style="display:none">
+      <div class="cli-title">👤 Seus dados</div>
+      <div class="cli-grid">
+        <div class="cli-field"><label for="cliNome">Nome *</label><input class="cli-input" id="cliNome" autocomplete="name" placeholder="Seu nome" maxlength="60"></div>
+        <div class="cli-field"><label for="cliTel">WhatsApp *</label><input class="cli-input" id="cliTel" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(31) 99999-9999" maxlength="15"></div>
+      </div>
+      <div id="cliEndWrap" style="display:none">
+        <div class="cli-title" style="margin-top:6px">📍 Endereço de entrega</div>
+        <div class="cli-grid cli-grid-end">
+          <div class="cli-field"><label for="cliRua">Rua *</label><input class="cli-input" id="cliRua" autocomplete="address-line1" placeholder="Nome da rua" maxlength="80"></div>
+          <div class="cli-field"><label for="cliNum">Número *</label><input class="cli-input" id="cliNum" placeholder="Nº" maxlength="10"></div>
+        </div>
+        <div class="cli-grid">
+          <div class="cli-field"><label for="cliBairro">Bairro *</label><input class="cli-input" id="cliBairro" autocomplete="address-level3" placeholder="Seu bairro" maxlength="50"></div>
+          <div class="cli-field"><label for="cliRef">Complemento / referência</label><input class="cli-input" id="cliRef" placeholder="Apto, bloco, ponto de referência" maxlength="80"></div>
+        </div>
+      </div>
+    </div>
+    <textarea class="obs-area" id="obsArea" rows="2" placeholder="Observações do pedido (ex.: sem granola, troco para R$ 50)" style="display:none"></textarea>
 
     <!-- CUPOM -->
     <div id="cupomWrap" style="display:none;margin-top:12px">
@@ -1082,6 +1111,15 @@ let cfg         = { pixChave: '31997892312', horario: null, banner: null, zonas:
 
 // ── FORMAT ────────────────────────────────────────
 const fmt  = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+
+// Entrega fotos do Cloudinary otimizadas (formato e qualidade automáticos, largura limitada)
+function imgOtimizada(url, largura) {
+  if(!url || typeof url !== 'string') return url;
+  const m = url.match(/^(https:\/\/res\.cloudinary\.com\/[^\/]+\/image\/upload\/)(.+)$/);
+  if(!m) return url;
+  if(/^[a-z]{1,3}_[^\/]*\//.test(m[2])) return url; // já tem transformação
+  return `${m[1]}f_auto,q_auto,w_${largura},c_limit/${m[2]}`;
+}
 const desc = (a,b) => Math.round((1-b/a)*100) + '% OFF';
 const uid  = () => 'x' + Math.random().toString(36).slice(2,8);
 const emoji= n => {
@@ -1160,7 +1198,7 @@ function renderLogo() {
   const ring = document.getElementById('logoRing');
   const src  = cfg.logoUrl || null;
   if(src) {
-    img.src=src; img.style.display='block'; emp.style.display='none';
+    img.src=imgOtimizada(src, 300); img.style.display='block'; emp.style.display='none';
     // Atualiza as meta tags de compartilhamento com o logo real
     const ogImg = document.querySelector('meta[property="og:image"]');
     const twImg = document.querySelector('meta[name="twitter:image"]');
@@ -1223,7 +1261,7 @@ function renderProdutos() {
         ${p.maxComplementos > 0 ? `<div style="font-size:10px;color:#6ee7b7;margin-top:5px;font-weight:600;letter-spacing:.3px">🎁 ${p.maxComplementos} acréscimo${p.maxComplementos>1?'s':''} grátis à escolha</div>` : ''}
       </div>
       <div class="pimg-wrap" id="pimgwrap-${p.id}">
-        ${p.imgUrl ? `<img src="${p.imgUrl}" alt="${p.nome}">` : `<div class="pimg-ph">🍇</div>`}
+        ${p.imgUrl ? `<img src="${imgOtimizada(p.imgUrl, 400)}" alt="${p.nome}" loading="lazy" decoding="async">` : `<div class="pimg-ph">🍇</div>`}
         <div class="pimg-edit-layer ${modoAdmin?'on':''}" onclick="event.stopPropagation();triggerProdImg('${p.id}')">
           <span>📷</span>Trocar
         </div>
@@ -1293,7 +1331,7 @@ function renderComplementos() {
         <button class="cadmin-btn del" onclick="event.stopPropagation();confirmarDel('comp','${c.id}','${c.nome}')">✕</button>
       </div>
       <div class="cimg-wrap" id="cimgwrap-${c.id}">
-        ${c.imgUrl ? `<img src="${c.imgUrl}" alt="${c.nome}">` : `<div class="cimg-ph">${emoji(c.nome)}</div>`}
+        ${c.imgUrl ? `<img src="${imgOtimizada(c.imgUrl, 240)}" alt="${c.nome}" loading="lazy" decoding="async">` : `<div class="cimg-ph">${emoji(c.nome)}</div>`}
         <div class="cimg-edit-layer ${modoAdmin?'on':''}" onclick="event.stopPropagation();triggerCompImg('${c.id}')">📷</div>
       </div>
       <div class="cbody">
@@ -1498,6 +1536,7 @@ function atualizarPedido() {
     lines.innerHTML = '<div class="order-empty">Nenhum item selecionado ainda.<br>Escolha um tamanho acima! 🍇</div>';
     btnP.disabled = btnC.disabled = true;
     delt.style.display = obs.style.display = 'none';
+    const cb0 = document.getElementById('clienteBox'); if(cb0) cb0.style.display = 'none';
     const cw = document.getElementById('cupomWrap'); if(cw) cw.style.display='none';
     flt.classList.remove('show'); pixS.classList.remove('open'); return;
   }
@@ -1506,7 +1545,7 @@ function atualizarPedido() {
   const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
   let total = precoBase;
   const scs = complementos.filter(c => compsSel.has(c.id));
-  let html = `<div class="order-line"><div class="order-line-info"><div class="order-line-name">🍇 ${prodSel.nome} ${labelTamanho}</div><div class="order-line-price">${fmt(precoBase)}</div></div><button class="order-line-remove" onclick="removerProdPedido()">✕ Remover</button></div>`;
+  let html = `<div class="order-line"><div class="order-line-info"><div class="order-line-name">🍇 ${nomeAcaiPedido()}</div><div class="order-line-price">${fmt(precoBase)}</div></div><button class="order-line-remove" onclick="removerProdPedido()">✕ Remover</button></div>`;
   // adicionais do produto (escolhidos no picker)
   (prodSel.adicionaisEscolhidos||[]).forEach(a => {
     total += (a.preco||0);
@@ -1538,6 +1577,8 @@ function atualizarPedido() {
   btnP.disabled = btnC.disabled = !lojaAberta;
   if(!lojaAberta) { btnP.title = btnC.title = 'Estamos fechados no momento'; }
   delt.style.display = 'flex'; obs.style.display = 'block';
+  const cb = document.getElementById('clienteBox'); if(cb) cb.style.display = 'block';
+  const ew = document.getElementById('cliEndWrap'); if(ew) ew.style.display = tipoEntrega==='entrega' ? 'block' : 'none';
   flt.classList.add('show');
   fval.textContent = fmt(total);
   const novaContagem = contarItens();
@@ -1552,11 +1593,12 @@ function atualizarPedido() {
 // ── CONFIRMAÇÃO + PIX + CARTÃO ────────────────────
 window.abrirConfirmacaoPedido = function(tipo) {
   if(!prodSel) return;
+  if(!validarDadosCliente()) return;
   const scs = complementos.filter(c => compsSel.has(c.id));
   const total = calcTotal();
   const precoBase = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.preco : prodSel.preco;
   const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
-  let html = `<div class="confirm-item"><span>🍇 ${prodSel.nome} ${labelTamanho}</span><span>${fmt(precoBase)}</span></div>`;
+  let html = `<div class="confirm-item"><span>🍇 ${nomeAcaiPedido()}</span><span>${fmt(precoBase)}</span></div>`;
   scs.forEach(c => { html+=`<div class="confirm-item"><span>+ ${c.nome}</span><span>${fmt(c.preco)}</span></div>`; });
   if(tipoEntrega==='entrega') {
     const taxa = getTaxaEntrega();
@@ -1625,6 +1667,104 @@ window.copiarPix = function() {
   setTimeout(()=>{ b.textContent = 'Copiar'; b.classList.remove('ok'); }, 2500);
 };
 
+// ── DADOS DO CLIENTE (nome, WhatsApp, endereço) ───────────────────────────
+const CHAVE_CLIENTE = 'acaavi_cliente';
+const CAMPOS_CLIENTE = ['cliNome','cliTel','cliRua','cliNum','cliBairro','cliRef'];
+
+function mascararTelefone(v) {
+  const d = String(v).replace(/\D/g, '').slice(0, 11);
+  if(d.length === 0) return '';
+  if(d.length <= 2)  return `(${d}`;
+  if(d.length <= 6)  return `(${d.slice(0,2)}) ${d.slice(2)}`;
+  if(d.length <= 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+  return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+}
+
+function dadosCliente() {
+  const g = id => ((document.getElementById(id) || {}).value || '').trim();
+  return { nome: g('cliNome'), tel: g('cliTel'), rua: g('cliRua'), num: g('cliNum'), bairro: g('cliBairro'), ref: g('cliRef') };
+}
+
+function enderecoCliente() {
+  const c = dadosCliente();
+  if(!c.rua && !c.bairro) return '';
+  let e = c.rua + (c.num ? ', nº ' + c.num : '');
+  if(c.bairro) e += (e ? ' — ' : '') + c.bairro;
+  if(c.ref) e += ` (${c.ref})`;
+  return e;
+}
+
+function salvarCliente() {
+  const o = {};
+  CAMPOS_CLIENTE.forEach(id => { const el = document.getElementById(id); if(el) o[id] = el.value; });
+  try { localStorage.setItem(CHAVE_CLIENTE, JSON.stringify(o)); } catch(e) {}
+}
+
+function iniciarCamposCliente() {
+  try {
+    const o = JSON.parse(localStorage.getItem(CHAVE_CLIENTE) || 'null');
+    if(o) CAMPOS_CLIENTE.forEach(id => { const el = document.getElementById(id); if(el && o[id]) el.value = o[id]; });
+  } catch(e) {}
+  CAMPOS_CLIENTE.forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input', () => {
+      if(id === 'cliTel') el.value = mascararTelefone(el.value);
+      el.classList.remove('cli-erro');
+      salvarCliente();
+    });
+  });
+  const zs = document.getElementById('zonaSelect');
+  if(zs) zs.addEventListener('change', () => zs.classList.remove('cli-erro'));
+}
+
+function validarDadosCliente() {
+  const g = id => ((document.getElementById(id) || {}).value || '').trim();
+  const faltando = [];
+  if(g('cliNome').length < 2) faltando.push('cliNome');
+  const tel = g('cliTel').replace(/\D/g, '');
+  if(tel.length < 10 || tel.length > 11) faltando.push('cliTel');
+  if(tipoEntrega === 'entrega') {
+    if((cfg.zonas || []).length > 0 && !zonaSelId) faltando.push('zonaSelect');
+    ['cliRua','cliNum','cliBairro'].forEach(id => { if(!g(id)) faltando.push(id); });
+  }
+  if(!faltando.length) return true;
+  faltando.forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('cli-erro'); });
+  const primeiro = document.getElementById(faltando[0]);
+  if(primeiro) {
+    try { primeiro.scrollIntoView({ behavior: 'smooth', block: 'center' }); primeiro.focus({ preventScroll: true }); } catch(e) {}
+  }
+  toast(faltando.length === 1 && faltando[0] === 'zonaSelect' ? 'Escolha sua região de entrega.' : 'Preencha os campos destacados para continuar.', 'err');
+  return false;
+}
+
+// ── BACKUP DO CARDÁPIO (botão do admin) ────────────────────────────────────
+window.baixarBackup = async function() {
+  try {
+    toast('Gerando backup...', 'ok');
+    const dados = {
+      sistema: 'acaavi', versao: 1, geradoEm: new Date().toISOString(),
+      produtos: await fbList('produtos'),
+      complementos: await fbList('complementos'),
+      cupons: await fbList('cupons'),
+      config: await fbGet('config', 'site'),
+    };
+    const pad = n => String(n).padStart(2, '0');
+    const d = new Date();
+    const nome = `acaavi-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+    const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    toast(`✅ Backup baixado: ${dados.produtos.length} produtos, ${dados.complementos.length} complementos, ${dados.cupons.length} cupons`, 'ok');
+  } catch(e) {
+    console.error('Erro no backup:', e);
+    toast('❌ Não foi possível gerar o backup. Tente de novo.', 'err');
+  }
+};
+
 function nomeAcaiPedido() {
   const labelTamanho = (prodSel.tipo==='variantes' && prodSel.varianteSel) ? prodSel.varianteSel.tamanho : prodSel.tamanho;
   // Não repete o tamanho quando ele já está no nome do açaí
@@ -1651,6 +1791,8 @@ function montarMensagemPedido() {
     const taxa = getTaxaEntrega();
     const zona = cfg.zonas.find(z=>z.id===zonaSelId);
     msg += `\n🛵 *Entrega${zona?' — '+zona.nome:''}:* ${taxa>0?fmt(taxa):'Grátis'}\n`;
+    const end = enderecoCliente();
+    if(end) msg += `📍 ${end}\n`;
   } else {
     msg += `\n🏪 *Retirada no local*\n`;
   }
@@ -1659,6 +1801,8 @@ function montarMensagemPedido() {
     msg += `\n🏷️ Cupom *${cupomAtivo.codigo}*: −${fmt(desconto)}\n`;
   }
   msg += `\n💰 *Total: ${fmt(total)}*`;
+  const cli = dadosCliente();
+  if(cli.nome || cli.tel) msg += `\n\n👤 *Cliente:* ${cli.nome}${cli.nome && cli.tel ? ' — ' : ''}${cli.tel}`;
   if(obs) msg += `\n\n📝 *Obs:* ${obs}`;
   return msg;
 }
@@ -2880,7 +3024,7 @@ window.previewOg = function() {
   if(el_u) el_u.textContent = u.replace(/https?:\/\//,'');
   // mostra logo no preview se disponível
   if(el_i && cfg.logoUrl) {
-    el_i.src = cfg.logoUrl;
+    el_i.src = imgOtimizada(cfg.logoUrl, 300);
     el_i.style.display = 'block';
     if(el_e) el_e.style.display = 'none';
   }
@@ -3160,6 +3304,7 @@ async function init() {
   renderStatusBanner();
   renderZonaSelect();
   renderEntregaInfo();
+  try { iniciarCamposCliente(); } catch(e) { console.error(e); }
   try { tratarRetornoPagamento(); } catch(e) { console.error(e); }
 }
 
