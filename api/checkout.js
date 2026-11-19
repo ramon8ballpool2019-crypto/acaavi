@@ -3,6 +3,8 @@
 // O valor NÃO é confiado ao navegador: é recalculado aqui com os preços reais
 // guardados no Firestore e só segue se bater com o valor mostrado no site.
 
+import { createHmac, timingSafeEqual } from 'node:crypto';
+
 const PROJECT_ID = 'acaavi-d8138';
 const FS_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
@@ -75,8 +77,42 @@ async function listarColecao(colecao) {
   return itens;
 }
 
+// ── Frete por distância: só vale a cotação assinada pelo servidor (api/frete.js) ──
+function assinarFrete(segredo, { cep, km, valor, aConfirmar, exp }) {
+  const v = aConfirmar ? 'A' : Number(valor).toFixed(2);
+  const k = km == null ? '-' : String(km);
+  return createHmac('sha256', segredo).update(`${cep}|${k}|${v}|${exp}`).digest('hex');
+}
+
+function taxaPorCotacao(c, segredo) {
+  if (!c || typeof c !== 'object') {
+    throw new ErroPedido('frete_ausente', 'Digite o CEP de entrega para calcular o frete.');
+  }
+  const cep = String(c.cep || '');
+  if (!/^\d{8}$/.test(cep)) {
+    throw new ErroPedido('frete_invalido', 'CEP de entrega inválido. Digite o CEP de novo.');
+  }
+  if (c.aConfirmar === true) {
+    throw new ErroPedido('frete_a_confirmar', 'O frete deste endereço será confirmado pelo WhatsApp. Envie o pedido para combinar o valor.');
+  }
+  const exp = Number(c.exp);
+  if (!Number.isFinite(exp) || exp < Date.now()) {
+    throw new ErroPedido('frete_expirado', 'O cálculo do frete expirou. Digite o CEP de novo.');
+  }
+  const esperada = assinarFrete(segredo, { cep, km: c.km, valor: c.valor, aConfirmar: false, exp });
+  const recebida = String(c.assinatura || '');
+  if (recebida.length !== esperada.length || !timingSafeEqual(Buffer.from(recebida), Buffer.from(esperada))) {
+    throw new ErroPedido('frete_invalido', 'Não foi possível validar o frete. Digite o CEP de novo.');
+  }
+  const valor = Number(c.valor);
+  if (!Number.isFinite(valor) || valor < 0) {
+    throw new ErroPedido('frete_invalido', 'Não foi possível validar o frete. Digite o CEP de novo.');
+  }
+  return valor;
+}
+
 // ── Cálculo do total (espelha exatamente o cálculo do site) ──────────────────
-function calcularPedido(pedido, { produto, complementos, config, cupons }) {
+function calcularPedido(pedido, { produto, complementos, config, cupons, segredo }) {
   if (produto.esgotado) {
     throw new ErroPedido('produto_esgotado', 'Este produto está esgotado no momento.');
   }
@@ -115,10 +151,17 @@ function calcularPedido(pedido, { produto, complementos, config, cupons }) {
   // Entrega
   let taxa = 0;
   if (pedido.entrega === true) {
-    const zonas = Array.isArray(config.zonas) ? config.zonas : ZONAS_PADRAO;
-    const zona = zonas.find((z) => z.id === pedido.zonaId);
-    if (zona) taxa = zona.gratis ? 0 : Number(zona.taxa) || 0;
-    else taxa = zonas.length > 0 ? Number(zonas[0].taxa) || 0 : 6.99;
+    const freteConf = config.frete || {};
+    if (freteConf.ativo !== false) {
+      // Frete por distância (CEP): só vale a cotação assinada pelo servidor
+      taxa = taxaPorCotacao(pedido.frete, segredo);
+    } else {
+      // Frete por região (modo antigo, quando o admin desliga o frete por CEP)
+      const zonas = Array.isArray(config.zonas) ? config.zonas : ZONAS_PADRAO;
+      const zona = zonas.find((z) => z.id === pedido.zonaId);
+      if (zona) taxa = zona.gratis ? 0 : Number(zona.taxa) || 0;
+      else taxa = zonas.length > 0 ? Number(zonas[0].taxa) || 0 : 6.99;
+    }
   }
 
   // Cupom
@@ -195,7 +238,7 @@ export default async function handler(req, res) {
   let valor;
   try {
     const dados = await carregarDados(pedido);
-    valor = calcularPedido(pedido, dados);
+    valor = calcularPedido(pedido, { ...dados, segredo: token });
   } catch (e) {
     if (e instanceof ErroPedido) {
       return res.status(e.status).json({ error: e.codigo, mensagem: e.message });
