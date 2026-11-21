@@ -808,6 +808,8 @@ section{position:relative;z-index:1;padding:60px 20px;max-width:980px;margin:0 a
       <label for="freteAtivo" style="font-size:13px;font-weight:600;cursor:pointer;">Calcular o frete pelo CEP (desmarque para voltar às regiões)</label>
     </div>
     <div class="mfield"><label>CEP da loja</label><input class="minput" id="freteLojaCep" inputmode="numeric" maxlength="9" placeholder="00000-000"></div>
+    <div class="mfield"><label>Coordenadas da loja (opcional, mais preciso)</label><input class="minput" id="freteLojaCoord" placeholder="-19.690000, -43.920000"></div>
+    <p style="font-size:12px;margin:-4px 0 10px">No Google Maps, clique com o botão direito no local exato da loja e clique nos números que aparecem para copiar. Deixe vazio para usar só o CEP.</p>
     <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin:6px 0 8px;">Faixas de distância</div>
     <div class="frete-faixa"><span>Até</span><input class="minput" id="fAte1" inputmode="decimal" placeholder="1"><span>km → R$</span><input class="minput" id="fVal1" inputmode="decimal" placeholder="4,99"></div>
     <div class="frete-faixa"><span>Até</span><input class="minput" id="fAte2" inputmode="decimal" placeholder="2"><span>km → R$</span><input class="minput" id="fVal2" inputmode="decimal" placeholder="5,99"></div>
@@ -1863,6 +1865,7 @@ window.abrirModalFrete = function() {
   const f = cfg.frete || {};
   document.getElementById('freteAtivo').checked = f.ativo !== false;
   document.getElementById('freteLojaCep').value = mascararCep(f.lojaCep || '33202506');
+  document.getElementById('freteLojaCoord').value = f.lojaCoord || '';
   const fx = faixasFrete();
   for(let i = 1; i <= 3; i++) {
     const x = fx[i - 1];
@@ -1877,6 +1880,15 @@ window.salvarFrete = async function() {
   const ativo = document.getElementById('freteAtivo').checked;
   const cep = (document.getElementById('freteLojaCep').value || '').replace(/\D/g, '');
   if(cep.length !== 8) { toast('Digite o CEP da loja com 8 números.', 'err'); return; }
+  const coordTxt = (document.getElementById('freteLojaCoord').value || '').trim();
+  let lojaCoord = '';
+  if(coordTxt) {
+    const mc = coordTxt.match(/(-?\d+(?:\.\d+)?)\s*[,;\s]\s*(-?\d+(?:\.\d+)?)/);
+    const la = mc ? Number(mc[1]) : NaN;
+    const lo = mc ? Number(mc[2]) : NaN;
+    if(!(la > -34 && la < 6 && lo > -74 && lo < -33)) { toast('Coordenadas inválidas. Copie do Google Maps, por exemplo: -19.690000, -43.920000', 'err'); return; }
+    lojaCoord = `${la}, ${lo}`;
+  }
   const faixas = [];
   for(let i = 1; i <= 3; i++) {
     const ate = num('fAte' + i);
@@ -1891,8 +1903,8 @@ window.salvarFrete = async function() {
     if(faixas[i].ate === faixas[i - 1].ate) { toast('Duas faixas têm a mesma distância.', 'err'); return; }
   }
   try {
-    await fbSet('config', 'site', { frete: { ativo, lojaCep: cep, faixas } });
-    cfg.frete = { ativo, lojaCep: cep, faixas };
+    await fbSet('config', 'site', { frete: { ativo, lojaCep: cep, lojaCoord, faixas } });
+    cfg.frete = { ativo, lojaCep: cep, lojaCoord, faixas };
     freteCalc = null;
     setCepStatus('', '');
     atualizarModoFrete();
